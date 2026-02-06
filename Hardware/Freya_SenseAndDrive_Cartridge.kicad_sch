@@ -4265,7 +4265,7 @@
 		)
 		(uuid "fdc9acd0-1829-472e-b68f-5dbd102ee47f")
 	)
-	(text "Copyright© 2024 Sanne 'SpuQ' Santens. This design is released under\nthe CERN OHL-W license on GitHub."
+	(text "Copyright© 2024-2026 Sanne 'SpuQ' Santens. This design is released under\nthe CERN OHL-W license on GitHub."
 		(exclude_from_sim no)
 		(at 179.07 178.816 0)
 		(effects
@@ -4289,7 +4289,7 @@
 		)
 		(uuid "22b2d536-7887-4eb4-87ea-0c8a7bbbfe87")
 	)
-	(text "EDGEBERRY HARDWARE CARTRIDGE"
+	(text "Freya - Vivarium Control System"
 		(exclude_from_sim no)
 		(at 178.816 172.466 0)
 		(effects
@@ -4303,7 +4303,7 @@
 		)
 		(uuid "45b8b946-7772-4849-b171-7732e1fae054")
 	)
-	(text "Sense'n'Drive Cartridge, Rev.: 1.0, mid 2024\n"
+	(text "Sense'n'Drive Cartridge, Rev.: 1.1, early 2026\n"
 		(exclude_from_sim no)
 		(at 179.07 176.53 0)
 		(effects
