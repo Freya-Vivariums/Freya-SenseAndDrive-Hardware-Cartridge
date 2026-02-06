@@ -39,7 +39,7 @@ pinctrl set 21 op dh
 **'op' meaning 'output', 'dh' digital high, 'dl' digital low.*
 
 ## License & Collaboration
-**Copyright© 2024-2026 Sanne 'SpuQ' Santens**. The hardware and enclosure are released under the [**CERN OHL-W**](Hardware/LICENSE.txt) license. The software is released under the [**GNU GPL-3.0**](Software/LICENSE.txt) license. [Trademark rules](https://github.com/Freya-Vivariums/.github/blob/main/brand/Freya_Trademark_Rules_and_Guidelines.md) apply to the Freya™ brand.
+**Copyright© 2024-2026 Sanne 'SpuQ' Santens**. The hardware and enclosure are released under the [**CERN OHL-W**](Hardware/LICENSE.txt) license. The software is released under the [**GNU GPL-3.0**](Software/LICENSE.txt) license. Trademark rules apply to the [Freya™ brand](https://github.com/Freya-Vivariums/.github/blob/main/brand/Freya_Trademark_Rules_and_Guidelines.md) and the [Edgeberry™ brand](https://github.com/Edgeberry/.github/blob/main/brand/Edgeberry_Trademark_Rules_and_Guidelines.md).
 
 ### Collaboration
 
