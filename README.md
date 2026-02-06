@@ -1,10 +1,10 @@
 ![Freya banner](https://raw.githubusercontent.com/Freya-Vivariums/.github/refs/heads/main/brand/Freya_banner.png)
 
-<img src="documentation/SenseAndDrive_Cartridge.png" align="right" width="50%"/>
+<img src="Documentation/SenseAndDrive_Cartridge.png" align="right" width="50%"/>
 
-The **Sense'n'Drive Hardware Cartridge** provides your [Edgeberry](https://github.com/Edgeberry)-based Freya Vivarium Control System with 6 digital outputs and an I²C sensor port.
+The **Sense'n'Drive Hardware Cartridge** provides the [Edgeberry](https://github.com/Edgeberry)-based Freya Vivarium Control System controller with 6 digital outputs and an I²C sensor port.
 
-The Raspberry Pi's I²C bus is levelshifted to 5V, enabling compatibility with a wide range of peripheral components. The bus is routed to a 4P-2.0mm D90 connector, compatible with the Grove standard.
+The Raspberry Pi's I²C bus is levelshifted to 5V, enabling compatibility with a wide range of peripheral components. The bus is routed to a 4P-2.0mm D90 connector for connecting with the **Freya Terra Sensor**.
 
 The digital outputs are P-channel MOSFETs configured for sourcing. An external power source can be applied to drive the digital outputs, or the base board's power source can be used by internally wiring the dedicated connectors.
 
@@ -39,7 +39,7 @@ pinctrl set 21 op dh
 **'op' meaning 'output', 'dh' digital high, 'dl' digital low.*
 
 ## License & Collaboration
-**Copyright© 2024 Sanne 'SpuQ' Santens**. This project is released under the **CERN OHL-W** license. The [Rules & Guidelines](https://github.com/Edgeberry/.github/blob/main/brand/Edgeberry_Trademark_Rules_and_Guidelines.md) apply to the usage of the Edgeberry™ brand.
+**Copyright© 2024-2026 Sanne 'SpuQ' Santens**. The hardware and enclosure are released under the [**CERN OHL-W**](Hardware/LICENSE.txt) license. The software is released under the [**GNU GPL-3.0**](Software/LICENSE.txt) license. [Trademark rules](https://github.com/Freya-Vivariums/.github/blob/main/brand/Freya_Trademark_Rules_and_Guidelines.md) apply to the Freya™ brand.
 
 ### Collaboration
 
