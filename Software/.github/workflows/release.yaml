@@ -1,0 +1,59 @@
+name: Build and Package
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies
+        run: npm install --include=dev
+
+      - name: Build project
+        env:
+          CI: ""
+        run: npm run build
+
+      - name: Gather required files
+        run: |
+          mkdir tempdir
+          mv package.json tempdir/
+          mv build tempdir/
+          mv config/io.freya.SystemActuatorsDriver.service tempdir/
+          mv config/io.freya.SystemActuatorsDriver.conf tempdir/
+          mv scripts/uninstall.sh tempdir
+
+      - name: Create tarball
+        run: tar -C tempdir -zcvf package.tar.gz .
+
+      - name: Extract project name
+        id: project_name
+        run: |
+          # grab the repo name (after the slash) and export as a step output
+          echo "name=$(basename ${{ github.repository }})" >> $GITHUB_OUTPUT
+
+      - name: Rename package
+        run: |
+          mv package.tar.gz ${{ steps.project_name.outputs.name }}-${{ github.event.release.tag_name }}.tar.gz
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ steps.project_name.outputs.name }}-${{ github.event.release.tag_name }}.tar.gz
+            scripts/install.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

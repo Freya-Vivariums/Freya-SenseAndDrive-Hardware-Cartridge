@@ -1,0 +1,13 @@
+[Unit]
+Description=Freya System Actuators driver
+Documentation=https://github.com/Freya-Vivariums
+After=multi-user.target dbus.service
+
+[Service]
+WorkingDirectory=/opt/Freya/hardware/actuators-driver
+Type=simple
+ExecStart=/usr/bin/node /opt/Freya/hardware/actuators-driver/build/index.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

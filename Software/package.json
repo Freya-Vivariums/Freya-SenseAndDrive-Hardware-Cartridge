@@ -1,0 +1,26 @@
+{
+  "name": "freya-system-actuators-driver",
+  "version": "0.0.1",
+  "description": "System driver for the Freya system actuators",
+  "author": "Sanne 'SpuQ' Santens",
+  "license": "MIT",
+  "homepage": "https://github.com/Freya-Vivariums",
+  "public":false,
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "deploy": "bash ./scripts/deploy.sh",
+    "dev": "nodemon --watch src src/index.ts",
+    "start": "node build/index.js"
+  },
+  "dependencies": {
+    "dbus-native": "^0.4.0",
+    "i2c-bus": "^5.2.3"
+  },
+  "devDependencies": {
+    "@types/i2c-bus": "^5.1.2",
+    "nodemon": "^3.1.4",
+    "ts-node": "^10.9.2"
+  }
+}
