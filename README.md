@@ -1,8 +1,8 @@
-![Edgeberry banner](https://raw.githubusercontent.com/Edgeberry/.github/main/brand/EdgeBerry_banner_cartridge.png)
+![Freya banner](https://raw.githubusercontent.com/Freya-Vivariums/.github/refs/heads/main/brand/Freya_banner.png)
 
 <img src="documentation/SenseAndDrive_Cartridge.png" align="right" width="50%"/>
 
-The Edgeberry **Sense'n'Drive Hardware Cartridge** expands your project's capabilities with 6 digital outputs and an I²C sensor port.
+The **Sense'n'Drive Hardware Cartridge** provides your [Edgeberry](https://github.com/Edgeberry)-based Freya Vivarium Control System with 6 digital outputs and an I²C sensor port.
 
 The Raspberry Pi's I²C bus is levelshifted to 5V, enabling compatibility with a wide range of peripheral components. The bus is routed to a 4P-2.0mm D90 connector, compatible with the Grove standard.
 
