@@ -17,14 +17,24 @@ project) are licensed under CERN-OHL-W.
 Full license text: Hardware/LICENSE.txt and Enclosure/LICENSE.txt
 
 --------------------------------------------------------------------------------
-SOFTWARE
+DRIVER SOFTWARE
 --------------------------------------------------------------------------------
-Location: /Software/
+Location: /Software/Driver
 License: GNU General Public License v3.0 (GPL-3.0)
 
 The sensor driver software (TypeScript/Node.js) is licensed under GPL-3.0.
 
-Full license text: Software/LICENSE.txt
+Full license text: Software/Driver/LICENSE.txt
+
+--------------------------------------------------------------------------------
+CLIENT SOFTWARE
+--------------------------------------------------------------------------------
+Location: /Software/Client
+License: MIT
+
+The sensor driver client software is licensed under the MIT license
+
+Full license text: Software/Client/LICENSE.txt
 
 --------------------------------------------------------------------------------
 TRADEMARK
