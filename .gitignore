@@ -3,7 +3,7 @@ datasheets/
 Freya_SenseAndDrive_Cartridge.kicad_prl
 manufacturing/
 Freya_SenseAndDrive_Cartridge-backups/
-documentation/*.pdf
 *.step
 *.FCBak
 *.lck
+Documentation/*.wrl
