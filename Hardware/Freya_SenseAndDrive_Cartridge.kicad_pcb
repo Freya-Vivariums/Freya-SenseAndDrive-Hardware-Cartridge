@@ -2576,6 +2576,7 @@
 			)
 		)
 		(model "/home/tom/Projects/Freya-Edgeberry/Freya-controller/Enclosure/EBZero_Enclosure_Freya_2.wrl"
+			(hide yes)
 			(offset
 				(xyz 35.5 -10 5.25)
 			)
@@ -2598,6 +2599,7 @@
 			)
 		)
 		(model "/home/tom/Projects/Freya-Edgeberry/Freya-controller/Enclosure/EBZero.wrl"
+			(hide yes)
 			(offset
 				(xyz 35.5 36.5 -1)
 			)

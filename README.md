@@ -11,6 +11,8 @@ The digital outputs are P-channel MOSFETs configured for sourcing. An external p
 <br clear="right"/>
 
 ## Usage
+The **Sense'n'Drive Hardware Cartridge** is positioned in the expansion slot of the device.
+
 ### I²C
 Enable the I²C port using `raspi-config`:
 ```
