@@ -4,7 +4,7 @@
 
 The **Sense'n'Drive Hardware Cartridge** provides the [Edgeberry](https://github.com/Edgeberry)-based Freya Vivarium Control System controller with 6 digital outputs and an I²C sensor port.
 
-The Raspberry Pi's I²C bus is levelshifted to 5V, enabling compatibility with a wide range of peripheral components. The bus is routed to a 4P-2.0mm D90 connector for connecting with the **Freya Terra Sensor**.
+The Raspberry Pi's I²C bus is levelshifted to 5V, enabling compatibility with a wide range of peripheral components. The bus is routed to a 4P-2.0mm D90 connector for connecting with the [Freya "Terra" Sensor](https://github.com/Freya-Vivariums/Freya-Terra-Sensor) or a wide range of breakout boards.
 
 The digital outputs are P-channel MOSFETs configured for sourcing. An external power source can be applied to drive the digital outputs, or the base board's power source can be used by internally wiring the dedicated connectors.
 
