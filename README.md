@@ -2,7 +2,7 @@
 
 <img src="Documentation/SenseAndDrive_Cartridge.png" align="right" width="50%"/>
 
-The **Sense'n'Drive Hardware Cartridge** provides the Freya Vivarium Control System [controller](https://github.com/Edgeberry) with 6 digital outputs for driving actuators directly or through contactors, and a 5V I²C port for reliably connecting the [Freya "Terra" Sensor](https://github.com/Freya-Vivariums/Freya-Terra-Sensor).
+The **Sense'n'Drive Hardware Cartridge** provides the Freya Vivarium Control System [controller](https://github.com/Edgeberry) with 6 digital outputs for driving actuators directly or with interposing relays, and a 5V I²C port for reliably connecting the [Freya "Terra" Sensor](https://github.com/Freya-Vivariums/Freya-Terra-Sensor).
 
 <br clear="right"/>
 
