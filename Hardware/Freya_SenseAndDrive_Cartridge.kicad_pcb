@@ -2610,6 +2610,28 @@
 				(xyz 0 0 90)
 			)
 		)
+		(model "/home/tom/Projects/Freya-Edgeberry/Freya-controller/Enclosure/EBZero_Enclosure_Freya_2.wrl"
+			(offset
+				(xyz 35.5 35.5 5.25)
+			)
+			(scale
+				(xyz 0.3937 0.3937 0.3937)
+			)
+			(rotate
+				(xyz 90 180 0)
+			)
+		)
+		(model "/home/tom/Projects/Freya-Edgeberry/Freya-controller/Enclosure/EBZero.wrl"
+			(offset
+				(xyz 35.5 81.5 -1)
+			)
+			(scale
+				(xyz 0.3937 0.3937 0.3937)
+			)
+			(rotate
+				(xyz 0 0 90)
+			)
+		)
 	)
 	(footprint "emcosys:Grove_SMD_right_angle"
 		(layer "F.Cu")
