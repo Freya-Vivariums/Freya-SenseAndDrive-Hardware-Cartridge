@@ -6,4 +6,5 @@ Freya_SenseAndDrive_Cartridge-backups/
 *.step
 *.FCBak
 *.lck
+*_autosave*
 Documentation/*.wrl
