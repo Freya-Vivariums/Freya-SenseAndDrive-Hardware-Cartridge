@@ -16,8 +16,16 @@ The digital outputs are P-channel MOSFETs configured for sourcing. An external p
 
 <br clear="left"/>
 
-### I²C
-Enable the I²C port using `raspi-config`:
+### I²C sensor port
+The I²C port is level-shifted to 5V, and connected to the JST 4P connector in the following way;
+|  Pin   | Function |
+|--------|----------|
+| 1      | SCL      |
+| 2      | SDA      |
+| 3      | +5V      |
+| 4      | GND      |
+
+On Raspberry Pi, enable the I²C port using `raspi-config`:
 ```
 $ sudo raspi-config
 > 3     Interface options
@@ -27,7 +35,7 @@ $ sudo raspi-config
 Now you can use the I²C interface `/dev/i2c-1` for connecting peripheral components.
 
 ### Digital Outputs
-The digital outputs are connected as following:
+The digital outputs are P-channel MOSFETs configured for **sourcing**, and are connected as following:
 |  GPIO  | OUTPUT |
 |--------|--------|
 | GPIO21 | D1     |
