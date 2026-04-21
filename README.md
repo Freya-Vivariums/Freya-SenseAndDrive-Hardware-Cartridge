@@ -2,7 +2,11 @@
 
 <img src="Documentation/SenseAndDrive_Cartridge.png" align="right" width="40%"/>
 
-The **Sense'n'Drive Hardware Cartridge** provides the [controller](https://github.com/Edgeberry) with 6 digital outputs for driving actuators directly or with interposing relays, and a 5V I²C port for reliably connecting the [Freya "Terra" Sensor](https://github.com/Freya-Vivariums/Freya-Terra-Sensor).
+The **Sense'n'Drive Hardware Cartridge** provides the [controller](https://github.com/Edgeberry) with the capability for connecting to sensors and driving actuators.
+
+**Features**
+- **6 digital outputs** for driving actuators directly or with interposing relays, with internal or external power source.
+- **An I²C port** level-shifted to 5V for reliably connecting to the [Freya "Terra" Sensor](https://github.com/Freya-Vivariums/Freya-Terra-Sensor)
 
 <br clear="right"/>
 
