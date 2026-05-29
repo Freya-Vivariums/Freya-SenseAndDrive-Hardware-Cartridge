@@ -1,5 +1,5 @@
 <!--
-  Freya Vivarium Control System - Freya Hardware Cartridge Node HTML
+  Freya Vivarium Control System - Digital Output Node HTML
   Copyright (C) 2025 Sanne 'SpuQ' Santens
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,7 @@
   SOFTWARE.
 -->
 <script type="text/javascript">
-  RED.nodes.registerType('freya-hardware-cartridge',{
+  RED.nodes.registerType('digital-output',{
     category: 'Freya Vivariums',
     color: "#70B62D",
     defaults: {
@@ -35,12 +35,12 @@
     outputLabels:["status"],
     icon: "font-awesome/fa-microchip",
     label: function() {
-      return this.name || "Freya Hardware Cartridge";
+      return this.name || "Digital Output";
     }
   });
 </script>
 
-<script type="text/html" data-template-name="freya-hardware-cartridge">
+<script type="text/html" data-template-name="digital-output">
   <div class="form-row">
     <label for="node-input-name"><i class="icon-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
@@ -76,6 +76,6 @@
   </div>
 </script>
 
-<script type="text/html" data-help-name="freya-hardware-cartridge">
-  <p>The <strong>Freya Hardware Cartridge</strong> lorem ipsum ...</p>
+<script type="text/html" data-help-name="digital-output">
+  <p>The <strong>Digital Output</strong> node controls a single digital output channel on the Freya Hardware Cartridge. Configure an actuator name to filter incoming messages, select the physical output channel (1–6), and set the operation mode.</p>
 </script>

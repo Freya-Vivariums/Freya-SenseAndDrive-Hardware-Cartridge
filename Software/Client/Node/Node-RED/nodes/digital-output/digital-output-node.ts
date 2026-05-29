@@ -1,5 +1,5 @@
 /*
- * Freya Vivarium Control System - Freya Hardware Cartridge Node
+ * Freya Vivarium Control System - Digital Output Node
  * Copyright (C) 2025 Sanne 'SpuQ' Santens
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,8 +22,8 @@
  */
 
 /**
- * @file freya-hardware-cartridge-node.ts
- * @module freya-hardware-cartridge-node
+ * @file digital-output-node.ts
+ * @module digital-output-node
  * @description
  * Node-RED node that uses the `@freya-vivariums/freya-hardware-cartridge` library
  * to communicate with Freya's System Actuators Driver over D-Bus.
@@ -42,8 +42,8 @@ interface NodeConfig extends NodeDef {
   mode: string;
 }
 
-const freyaHardwareCartridge: NodeInitializer = (RED: NodeAPI) => {
-  function FreyaHardwareCartridgeNode( this: Node, config: NodeConfig ) {
+const digitalOutput: NodeInitializer = (RED: NodeAPI) => {
+  function DigitalOutputNode( this: Node, config: NodeConfig ) {
     RED.nodes.createNode(this, config);
     const node = this;
 
@@ -104,7 +104,7 @@ const freyaHardwareCartridge: NodeInitializer = (RED: NodeAPI) => {
     });
   }
 
-  RED.nodes.registerType( 'freya-hardware-cartridge', FreyaHardwareCartridgeNode );
+  RED.nodes.registerType( 'digital-output', DigitalOutputNode );
 };
 
-export = freyaHardwareCartridge;
+export = digitalOutput;
