@@ -1,0 +1,39 @@
+{
+  "name": "@freya-vivariums/freya-hardware-cartridge",
+  "version": "0.0.0",
+  "description": "Node.js SDK for the Freya Hardware Cartridge D-Bus driver",
+  "author": "Sanne 'SpuQ' Santens",
+  "license": "MIT",
+  "homepage": "https://github.com/Freya-Vivariums/Freya-SenseAndDrive-Hardware-Cartridge",
+  "bugs": {
+    "url": "https://www.reddit.com/r/FreyaVivariums"
+  },
+  "private": false,
+  "keywords": [
+    "freya",
+    "vivarium",
+    "actuator",
+    "hardware",
+    "cartridge",
+    "dbus"
+  ],
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "bash ./scripts/build.sh"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "build"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "dbus-native": "^0.4.0"
+  }
+}

@@ -1,0 +1,81 @@
+<!--
+  Freya Vivarium Control System - Freya Hardware Cartridge Node HTML
+  Copyright (C) 2025 Sanne 'SpuQ' Santens
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+-->
+<script type="text/javascript">
+  RED.nodes.registerType('freya-hardware-cartridge',{
+    category: 'Freya Vivariums',
+    color: "#70B62D",
+    defaults: {
+      name: {value:""},
+      actuator: {value:""},
+      channel: {value:""},
+      mode: {value:""}
+    },
+    inputs:1,
+    outputs:1,
+    outputLabels:["status"],
+    icon: "font-awesome/fa-microchip",
+    label: function() {
+      return this.name || "Freya Hardware Cartridge";
+    }
+  });
+</script>
+
+<script type="text/html" data-template-name="freya-hardware-cartridge">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <hr/>
+    <div class="form-row">
+    <label for="node-input-actuator"><i class="icon-tag"></i> Actuator</label>
+    <input type="text" id="node-input-actuator" placeholder="e.g. heater">
+    <i class="fa fa-info-circle" title="The name of te actuator. This node will filter messages based on this name"></i>
+  </div>
+  <div class="form-row">
+    <label for="node-input-channel"><i class="icon-cog"></i> Channel</label>
+    <select id="node-input-channel">
+      <option value="0" disabled selected>Select output...</option>
+      <option value="1">Digital Output 1</option>
+      <option value="2">Digital Output 2</option>
+      <option value="3">Digital Output 3</option>
+      <option value="4">Digital Output 4</option>
+      <option value="5">Digital Output 5</option>
+      <option value="6">Digital Output 6</option>
+      <option value="0">Disabled</option>
+    </select>
+    <i class="fa fa-info-circle" title="The physical digital output where the actuator is connected to"></i>
+  </div>
+  <div class="form-row">
+    <label for="node-input-mode"><i class="icon-exchange"></i> Mode</label>
+    <select id="node-input-mode">
+      <option value="" disabled selected>Select mode...</option>
+      <option value="digital">on/off</option>
+      <option value="pwm" disabled>PWM</option>
+    </select>
+    <i class="fa fa-info-circle" title="The output mode"></i>
+  </div>
+</script>
+
+<script type="text/html" data-help-name="freya-hardware-cartridge">
+  <p>The <strong>Freya Hardware Cartridge</strong> lorem ipsum ...</p>
+</script>
