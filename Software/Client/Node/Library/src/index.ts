@@ -25,7 +25,7 @@
  * @file index.ts
  * @module @freya-vivariums/freya-hardware-cartridge
  * @description
- * Node.js/TypeScript SDK for the io.freya.SystemActuatorsDriver D-Bus service.
+ * Node.js/TypeScript SDK for the freya.cartridge.sensendrive D-Bus service.
  * Provides the ActuatorsDriver class for connecting to and controlling
  * the Freya Hardware Cartridge digital outputs.
  *
@@ -62,9 +62,9 @@ export class ActuatorsDriver extends EventEmitter {
    * Initialize D-Bus connection and proxy interface
    */
   async initDriverConnection(): Promise<void> {
-    const service = this.bus.getService('io.freya.SystemActuatorsDriver');
+    const service = this.bus.getService('freya.cartridge.sensendrive');
     this.iface = await new Promise((resolve, reject) => {
-      service.getInterface('/io/freya/SystemActuatorsDriver', 'io.freya.SystemActuatorsDriver', (err: Error | null, iface: any) => {
+      service.getInterface('/freya/cartridge/sensendrive', 'freya.cartridge.sensendrive', (err: Error | null, iface: any) => {
         if (err) {
           reject(err);
         } else {

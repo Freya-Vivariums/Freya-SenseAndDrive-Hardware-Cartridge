@@ -12,7 +12,7 @@
 PROJECT=Freya
 COMPONENT=actuators-driver
 COMPONENTTYPE=hardware
-SYSTEMSERVICENAME=io.freya.SystemActuatorsDriver
+SYSTEMSERVICENAME=freya.cartridge.sensendrive
 REPONAME=${PROJECT}-${COMPONENT}
 REPOOWNER=Freya-Vivariums
 APPDIR=/opt/${PROJECT}/${COMPONENTTYPE}/${COMPONENT}

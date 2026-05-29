@@ -1,5 +1,5 @@
 [Unit]
-Description=Freya System Actuators driver
+Description=Freya SenseAndDrive Hardware Cartridge Driver
 Documentation=https://github.com/Freya-Vivariums
 After=multi-user.target dbus.service
 

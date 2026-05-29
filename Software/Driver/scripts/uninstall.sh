@@ -12,7 +12,7 @@
 PROJECT=Freya
 COMPONENT=actuators-driver
 COMPONENTTYPE=hardware
-SYSTEMSERVICENAME=io.freya.SystemActuatorsDriver
+SYSTEMSERVICENAME=freya.cartridge.sensendrive
 APPDIR=/opt/${PROJECT}/${COMPONENTTYPE}/${COMPONENT}
 
 # Check if this script is running as root. If not, notify the user

@@ -5,7 +5,7 @@
   "author": "Sanne 'SpuQ' Santens",
   "license": "MIT",
   "homepage": "https://github.com/Freya-Vivariums",
-  "public":false,
+  "public": false,
   "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@types/i2c-bus": "^5.1.2",
+    "@types/node": "^25.9.1",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2"
   }

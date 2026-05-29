@@ -12,7 +12,7 @@ DEFAULT_HOST=192.168.1.113
 PROJECT=Freya
 COMPONENT=actuators-driver
 COMPONENTTYPE=hardware
-SERVICENAME="io.freya.SystemActuatorsDriver"
+SERVICENAME="freya.cartridge.sensendrive"
 APPDIR=/opt/${PROJECT}/${COMPONENTTYPE}/${COMPONENT}
 
 # Let's start with an empty terminal
@@ -61,8 +61,8 @@ EOF
 echo -e '\e[0;32mCopying project to device...\e[m'
 sshpass -p ${PASSWORD} scp -r   ./package.json \
                                 ./build/ \
-                                ./config/io.freya.SystemActuatorsDriver.conf \
-                                ./config/io.freya.SystemActuatorsDriver.service \
+                                ./config/freya.cartridge.sensendrive.conf \
+                                ./config/freya.cartridge.sensendrive.service \
                                 ./scripts/uninstall.sh \
                                 ${USER}@${HOST}:${APPDIR}
 

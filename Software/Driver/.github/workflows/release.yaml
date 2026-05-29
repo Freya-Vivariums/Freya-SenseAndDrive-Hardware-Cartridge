@@ -32,8 +32,8 @@ jobs:
           mkdir tempdir
           mv package.json tempdir/
           mv build tempdir/
-          mv config/io.freya.SystemActuatorsDriver.service tempdir/
-          mv config/io.freya.SystemActuatorsDriver.conf tempdir/
+          mv config/freya.cartridge.sensendrive.service tempdir/
+          mv config/freya.cartridge.sensendrive.conf tempdir/
           mv scripts/uninstall.sh tempdir
 
       - name: Create tarball

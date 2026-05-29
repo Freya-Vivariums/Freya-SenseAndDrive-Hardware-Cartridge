@@ -19,7 +19,7 @@ npm install @freya-vivariums/freya-hardware-cartridge-node-red-contrib
 ```
 
 ## Node: Freya Hardware Cartridge
-Connects to the `io.freya.SystemActuatorsDriver` D-Bus service and controls the 6 digital outputs of the Hardware Cartridge. Configure the actuator name (used to filter incoming messages), the physical output channel (1–6), and the operation mode (`on/off`).
+Connects to the `freya.cartridge.sensendrive` D-Bus service and controls the 6 digital outputs of the Hardware Cartridge. Configure the actuator name (used to filter incoming messages), the physical output channel (1–6), and the operation mode (`on/off`).
 
 ## License & Collaboration
 **Copyright© 2025 Sanne 'SpuQ' Santens**. This project is licensed under the **[MIT License](LICENSE.txt)**. The [Rules & Guidelines](https://github.com/Freya-Vivariums/.github/blob/main/brand/Freya_Trademark_Rules_and_Guidelines.md) apply to the usage of the Freya Vivariums™ brand.

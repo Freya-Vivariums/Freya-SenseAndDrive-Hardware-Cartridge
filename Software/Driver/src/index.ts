@@ -11,9 +11,9 @@ const dbus = require('dbus-native');
 import { exec } from 'child_process';
 
 // DBus service constants
-const DBUS_SERVICE = 'io.freya.SystemActuatorsDriver';
-const DBUS_PATH = '/io/freya/SystemActuatorsDriver';
-const DBUS_INTERFACE = 'io.freya.SystemActuatorsDriver';
+const DBUS_SERVICE = 'freya.cartridge.sensendrive';
+const DBUS_PATH = '/freya/cartridge/sensendrive';
+const DBUS_INTERFACE = 'freya.cartridge.sensendrive';
 
 // Edgeberry's Sense'n'Drive Hardware Cartridge Digital outputs mapping
 const channels = [
