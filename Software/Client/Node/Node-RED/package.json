@@ -41,6 +41,6 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@freya-vivariums/freya-hardware-cartridge": "^0.0.1"
+    "@freya-vivariums/freya-hardware-cartridge": "file:../Library"
   }
 }

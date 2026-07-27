@@ -71,7 +71,7 @@ sshpass -p ${PASSWORD} ssh -o StrictHostKeyChecking=no ${USER}@${HOST} << EOF
     sudo su
     echo -e '\e[0;32mInstalling project dependencies... \e[m'
     cd $APPDIR/
-    npm install
+    npm install --omit=dev
     if [ $? -eq 0 ]; then
         echo -e "\e[0;32m[Success]\e[0m"
     else

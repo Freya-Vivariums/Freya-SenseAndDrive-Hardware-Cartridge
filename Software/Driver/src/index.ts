@@ -7,187 +7,445 @@
  *  Released under the MIT License (see LICENSE.txt)
  */
 
-const dbus = require('dbus-native');
-import { exec } from 'child_process';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import dbus from 'dbus-native';
+import type {
+  ChannelConfig,
+  ChannelState,
+  OutputWrite,
+  SenseNDriveErrorCode,
+} from '@freya-vivariums/freya-hardware-cartridge';
 
-// DBus service constants
+const execFileAsync = promisify(execFile);
+
+/* ---------------------------------------------------------------------------
+ * D-Bus transport constants (settled contract — do not change)
+ * ------------------------------------------------------------------------- */
 const DBUS_SERVICE = 'freya.cartridge.sensendrive';
 const DBUS_PATH = '/freya/cartridge/sensendrive';
 const DBUS_INTERFACE = 'freya.cartridge.sensendrive';
+const SCHEMA_VERSION = 1;
 
-// Edgeberry's Sense'n'Drive Hardware Cartridge Digital outputs mapping
-const channels = [
-  /* channel 1 */ 21, // Main lights
-  /* channel 2 */ 20, // Heater
-  /* channel 3 */ 16, // Misting pump
-  /* channel 4 */ 13, // (unused)
-  /* channel 5 */ 12, // Ventilation
-  /* channel 6 */ 18  // Auxiliary lights
-];
+/*
+ * Channel -> GPIO map (Edgeberry Sense'n'Drive Hardware Cartridge).
+ * NOTE: these are GPIOxx software numbers, NOT physical header pin positions.
+ */
+const GPIO_FOR_CHANNEL: readonly number[] = [21, 20, 16, 13, 12, 18];
+const CHANNEL_COUNT = GPIO_FOR_CHANNEL.length;
 
-// Connect to the system D-Bus
+const DEFAULT_CONFIG: ChannelConfig = { mode: 'off', frequency_hz: null, rampRate: 0 };
+const DEFAULT_SETPOINT = 0;
+
+/* ---------------------------------------------------------------------------
+ * Typed domain error. Thrown everywhere internally and converted to the JSON
+ * error envelope in exactly one place (the D-Bus method wrapper).
+ * ------------------------------------------------------------------------- */
+class DomainError extends Error {
+  readonly code: SenseNDriveErrorCode;
+  constructor(code: SenseNDriveErrorCode, message: string) {
+    super(message);
+    this.name = 'DomainError';
+    this.code = code;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * GpioPort — the single boundary through which ALL hardware access happens.
+ * Step 3 replaces the implementation behind this interface; nothing outside it
+ * may know how pins are actually driven.
+ * ------------------------------------------------------------------------- */
+export interface GpioPort {
+  /** Mux a GPIO to output and drive it low. Called once per pin at startup. */
+  initOutput(gpio: number): Promise<void>;
+  /** Change the value of an already-configured output. */
+  write(gpio: number, high: boolean): Promise<void>;
+}
+
+/** pinctrl-backed GpioPort. Board differences are handled by pinctrl itself. */
+class PinctrlGpioPort implements GpioPort {
+  async initOutput(gpio: number): Promise<void> {
+    await execFileAsync('pinctrl', ['set', String(gpio), 'op', 'dl']);
+  }
+  async write(gpio: number, high: boolean): Promise<void> {
+    await execFileAsync('pinctrl', ['set', String(gpio), high ? 'dh' : 'dl']);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * OutputChannel — volatile per-channel state plus its single timer handle.
+ * ------------------------------------------------------------------------- */
+class OutputChannel {
+  config: ChannelConfig;
+  setpoint: number;
+  actual: number;
+  private timer: ReturnType<typeof setTimeout> | null = null;
+
+  constructor(readonly channel: number, readonly gpio: number) {
+    this.config = { ...DEFAULT_CONFIG };
+    this.setpoint = DEFAULT_SETPOINT;
+    this.actual = 0;
+  }
+
+  /** Cancel and forget this channel's timer, if any. At most one is ever held. */
+  clearTimer(): void {
+    if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+  }
+
+  toState(): ChannelState {
+    return {
+      channel: this.channel,
+      config: { ...this.config },
+      setpoint: this.setpoint,
+      actual: this.actual,
+    };
+  }
+}
+
+function statesEqual(a: ChannelState, b: ChannelState): boolean {
+  return (
+    a.channel === b.channel &&
+    a.config.mode === b.config.mode &&
+    a.config.frequency_hz === b.config.frequency_hz &&
+    a.config.rampRate === b.config.rampRate &&
+    a.setpoint === b.setpoint &&
+    a.actual === b.actual
+  );
+}
+
+/* ---------------------------------------------------------------------------
+ * OutputController — owns the channels and all the API semantics.
+ * ------------------------------------------------------------------------- */
+class OutputController {
+  private readonly channels: OutputChannel[];
+
+  constructor(
+    private readonly gpio: GpioPort,
+    private readonly onChanged: (state: ChannelState) => void,
+  ) {
+    this.channels = GPIO_FOR_CHANNEL.map((gpioNum, i) => new OutputChannel(i + 1, gpioNum));
+  }
+
+  /** Mux every pin to output and drive it low. Comes up mode "off", setpoint 0. */
+  async initialize(): Promise<void> {
+    for (const ch of this.channels) {
+      await this.gpio.initOutput(ch.gpio);
+    }
+  }
+
+  getOutputs(): ChannelState[] {
+    return this.channels.map((c) => c.toState());
+  }
+
+  async setOutput(write: OutputWrite): Promise<ChannelState> {
+    const ch = this.requireChannel(write?.channel);
+    const candidate = this.buildCandidate(ch, write);
+    const changed = await this.applyCandidate(ch, candidate);
+    if (changed) this.onChanged(ch.toState());
+    return ch.toState();
+  }
+
+  async setOutputs(writes: unknown): Promise<ChannelState[]> {
+    if (!Array.isArray(writes)) {
+      throw new DomainError('EINVAL', 'SetOutputs requires an "outputs" array');
+    }
+    // Validate every entry first; if any fails, apply none.
+    const plans: Array<{ ch: OutputChannel; candidate: ChannelState }> = [];
+    for (const write of writes as OutputWrite[]) {
+      const ch = this.requireChannel(write?.channel);
+      try {
+        plans.push({ ch, candidate: this.buildCandidate(ch, write) });
+      } catch (err) {
+        if (err instanceof DomainError) {
+          throw new DomainError(err.code, `channel ${ch.channel}: ${err.message}`);
+        }
+        throw err;
+      }
+    }
+    // All valid: apply all.
+    const results: ChannelState[] = [];
+    for (const { ch, candidate } of plans) {
+      const changed = await this.applyCandidate(ch, candidate);
+      if (changed) this.onChanged(ch.toState());
+      results.push(ch.toState());
+    }
+    return results;
+  }
+
+  /** Stop every channel's timer. Part of the shutdown sequence. */
+  stopAllTimers(): void {
+    for (const ch of this.channels) ch.clearTimer();
+  }
+
+  /**
+   * Safe-state primitive: attempt to drive every channel low, then report which
+   * channels failed rather than discarding outcomes.
+   */
+  async driveAllLow(): Promise<number[]> {
+    const results = await Promise.allSettled(
+      this.channels.map((ch) => this.gpio.write(ch.gpio, false)),
+    );
+    const failed: number[] = [];
+    results.forEach((r, i) => {
+      if (r.status === 'fulfilled') {
+        const ch = this.channels[i];
+        ch.config = { ...DEFAULT_CONFIG };
+        ch.setpoint = DEFAULT_SETPOINT;
+        ch.actual = 0;
+      } else {
+        failed.push(this.channels[i].channel);
+      }
+    });
+    return failed;
+  }
+
+  private requireChannel(n: unknown): OutputChannel {
+    if (typeof n !== 'number' || !Number.isInteger(n) || n < 1 || n > CHANNEL_COUNT) {
+      throw new DomainError(
+        'ECHANNEL',
+        `channel ${JSON.stringify(n)} does not exist (valid channels are 1-${CHANNEL_COUNT})`,
+      );
+    }
+    return this.channels[n - 1];
+  }
+
+  /**
+   * Merge-patch the write onto the channel's current state and fully validate
+   * the resulting candidate. Pure: touches neither the channel nor hardware, so
+   * a validation failure leaves everything unchanged (atomicity).
+   */
+  private buildCandidate(ch: OutputChannel, write: OutputWrite): ChannelState {
+    const config: ChannelConfig = { ...ch.config };
+    let setpoint = ch.setpoint;
+
+    if (write && typeof write === 'object' && write.config != null) {
+      if (typeof write.config !== 'object') {
+        throw new DomainError('EINVAL', '"config" must be an object');
+      }
+      const w = write.config;
+      if ('mode' in w) config.mode = w.mode == null ? DEFAULT_CONFIG.mode : (w.mode as ChannelConfig['mode']);
+      if ('frequency_hz' in w) config.frequency_hz = w.frequency_hz == null ? DEFAULT_CONFIG.frequency_hz : (w.frequency_hz as number);
+      if ('rampRate' in w) config.rampRate = w.rampRate == null ? DEFAULT_CONFIG.rampRate : (w.rampRate as number);
+    }
+    if (write && typeof write === 'object' && 'setpoint' in write) {
+      setpoint = write.setpoint == null ? DEFAULT_SETPOINT : (write.setpoint as number);
+    }
+
+    return this.validateAndRealize(ch.channel, config, setpoint);
+  }
+
+  /**
+   * Validate a fully-merged candidate and compute its realized `actual`.
+   * Order matters: structural/range checks (EINVAL) run before the Step 1 mode
+   * availability gate (EMODE), so an out-of-range frequency on a PWM mode still
+   * reports EINVAL. The mode gate lives ONLY here.
+   */
+  private validateAndRealize(channel: number, config: ChannelConfig, setpoint: number): ChannelState {
+    const validModes = ['off', 'switch', 'pwm-slow', 'pwm'];
+    if (!validModes.includes(config.mode)) {
+      throw new DomainError('EINVAL', `unknown mode ${JSON.stringify(config.mode)}`);
+    }
+
+    // frequency_hz is meaningless in off/switch — normalize to null.
+    if (config.mode === 'off' || config.mode === 'switch') {
+      config.frequency_hz = null;
+    }
+
+    if (config.frequency_hz !== null) {
+      const f = config.frequency_hz;
+      if (typeof f !== 'number' || !Number.isFinite(f)) {
+        throw new DomainError('EINVAL', 'frequency_hz must be a finite number');
+      }
+      if (config.mode === 'pwm-slow' && (f < 0.001 || f > 1)) {
+        throw new DomainError('EINVAL', `frequency_hz for pwm-slow must be within 0.001-1 Hz (got ${f})`);
+      }
+      if (config.mode === 'pwm' && (f < 1 || f > 30)) {
+        throw new DomainError('EINVAL', `frequency_hz for pwm must be within 1-30 Hz (got ${f})`);
+      }
+    }
+
+    if (typeof config.rampRate !== 'number' || !Number.isFinite(config.rampRate) || config.rampRate < 0) {
+      throw new DomainError('EINVAL', 'rampRate must be a number >= 0');
+    }
+
+    if (typeof setpoint !== 'number' || !Number.isFinite(setpoint) || setpoint < 0 || setpoint > 1) {
+      throw new DomainError('EINVAL', `setpoint must be within 0.0-1.0 (got ${JSON.stringify(setpoint)})`);
+    }
+
+    // Step 1 mode gate (driver-only). PWM tiers are valid types but not realized yet.
+    if (config.mode === 'pwm-slow' || config.mode === 'pwm') {
+      throw new DomainError('EMODE', `mode '${config.mode}' is not yet implemented`);
+    }
+
+    // No ramping in Step 1: actual equals setpoint, except off which is always 0.
+    const actual = config.mode === 'off' ? 0 : setpoint;
+    return { channel, config, setpoint, actual };
+  }
+
+  private pinHigh(state: ChannelState): boolean {
+    // off => low; switch => high when the realized value is >= 0.5.
+    return state.config.mode === 'switch' && state.actual >= 0.5;
+  }
+
+  /** Apply an already-validated candidate. Returns whether anything changed. */
+  private async applyCandidate(ch: OutputChannel, candidate: ChannelState): Promise<boolean> {
+    const before = ch.toState();
+    if (statesEqual(before, candidate)) return false;
+
+    // Any config change replaces the channel's timer (none exist in Step 1).
+    ch.clearTimer();
+
+    const newHigh = this.pinHigh(candidate);
+    if (newHigh !== this.pinHigh(before)) {
+      try {
+        await this.gpio.write(ch.gpio, newHigh);
+      } catch (err) {
+        throw new DomainError('EIO', `failed to set channel ${ch.channel}: ${(err as Error).message}`);
+      }
+    }
+
+    ch.config = candidate.config;
+    ch.setpoint = candidate.setpoint;
+    ch.actual = candidate.actual;
+    return true;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * D-Bus wiring.
+ * ------------------------------------------------------------------------- */
 const systemBus = dbus.systemBus();
 
 /**
- *  init()
- *  Initialize the driver: acquire DBus name and export interface,
- *  Initialize all channels to digital low.
+ * The exported D-Bus service object. `emit` is monkey-patched by
+ * exportInterface() to actually dispatch signals onto the bus.
  */
-async function init(){
-    // Initialize our DBus service
-    if(systemBus){
-        console.log('\x1b[32mD-Bus client connected to system bus\x1b[30m');
-        try{
-            await registerDbusName();
-            createDbusInterface();
-        }
-        catch(e){
-            cleanup(1);
-        }
-    }
-    else{
-        console.error('\x1b[31mD-Bus client could not connect to system bus\x1b[30m');
-        cleanup(1);
-    }
+const serviceObject: {
+  GetOutputs: (request: string) => Promise<string>;
+  SetOutput: (request: string) => Promise<string>;
+  SetOutputs: (request: string) => Promise<string>;
+  emit: (signalName: string, ...args: any[]) => void;
+} = {
+  GetOutputs: (request) => handle(request, async () => ({ outputs: controller.getOutputs() })),
+  SetOutput: (request) => handle(request, (req) => controller.setOutput(req as OutputWrite)),
+  SetOutputs: (request) => handle(request, (req) => controller.setOutputs((req as { outputs?: unknown })?.outputs)),
+  emit: () => { /* replaced by exportInterface() */ },
+};
 
-    // Turn all outputs off
-    setAllOutputsOff()
-}
-
-init();
-
-/**
- *  cleanup()
- *  Clean up resources; release D-Bus name and turn off all outputs.
- */
-function cleanup(statuscode:number) {
-    console.log('');
-
-    // Release the D-Bus name (dbus-daemon will clean up on exit
-    // anyway, but it’s polite to do so ourselfs):
-    systemBus.releaseName(DBUS_SERVICE, (err:any) => {
-        if (err)
-            console.warn('Failed to release bus name:', err);
-        else
-            console.log(`Released D-Bus name "${DBUS_SERVICE}"`);
-    });
-
-    // Turn all outputs off
-    setAllOutputsOff();
-
-    // Clean exit
-    process.exit(statuscode);
-}
-
-/*
- *  System events
- *
- */
-// catch the system signals (when the process is kindly requested to stop)
-process.on('SIGTERM', ()=>cleanup(0));
-process.on('SIGINT', ()=>cleanup(0));
-// catch uncaught exceptions so you can clean up there too
-process.on('uncaughtException', err => {
-    console.error('Uncaught exception:', err);
-    cleanup(1);
+const controller = new OutputController(new PinctrlGpioPort(), (state) => {
+  serviceObject.emit('OutputChanged', JSON.stringify(state));
 });
 
-/*
- *  Actuator controls
+/**
+ * The one and only place domain errors become the JSON error envelope. Parses
+ * the bare request document, runs the handler, and envelopes the result.
  */
-
-
-/* 
- * SetDigitalOutput()
- * Set a digital output channel of the Edgeberry Sense'n'Drive 
- * Hardware Cartridge high or low via gpio-pinctrl
- * @param channel Logical channel number (1-6)
- * @param state   true = high / on, false = low / off
- * @returns       true on success, false on failure or invalid channel
- */
-function setDigitalOutput( channel:number, state:boolean ):boolean{
-    // Check whether the Channel value is correct
-    if( channel <1 || channel >6){
-        console.log("Digital output "+channel+" does not exist")
-        return false;
+async function handle(requestJson: string, fn: (req: any) => Promise<unknown>): Promise<string> {
+  try {
+    let req: unknown;
+    try {
+      req = requestJson && requestJson.length ? JSON.parse(requestJson) : {};
+    } catch {
+      throw new DomainError('EJSON', 'request body is not valid JSON');
     }
-    // Translate the channel number to the corresponding digital pin
-    const digitalPin = channels[channel-1];
-    // Translate the boolean state to the corresponding instruction
-    const digitalState = state?'dh':'dl';
-    try{
-        exec("pinctrl set "+digitalPin+" op "+digitalState);
-        return true;
-    }
-    catch(e){
-        console.warn("Failed to set Digital Output: "+e);
-        return false;
-    }
+    const result = await fn(req);
+    return JSON.stringify({ ok: true, result });
+  } catch (err) {
+    const code: SenseNDriveErrorCode = err instanceof DomainError ? err.code : 'EIO';
+    const message = err instanceof Error ? err.message : String(err);
+    return JSON.stringify({ ok: false, error: { code, message } });
+  }
 }
 
-/* 
- * SetAllOutputsOff()
- * Turns all digital output channels of the Edgeberry Sense'n'Drive 
- * Hardware Cartridge off
- */
-function setAllOutputsOff(){
-    let i=1;
-    while( i <= 6){
-        setDigitalOutput( i, false);
-        i++;
+function registerDbusName(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (!systemBus) {
+      reject(new Error('no system bus available'));
+      return;
     }
-}
-
-/*
- *  DBus
- */
-
-
-/* DBus service object */
-const serviceObject = {
-                        setDigitalOutput: (channel:number, state:boolean)=>{
-                          return setDigitalOutput( channel, state );
-                        },
-                        emit: (signalName:string, ...otherParameters:any )=>{}
-                      }
-/*
- *  Register D-Bus name
- */
-function registerDbusName():Promise<void>{
-    return new Promise((resolve, reject)=>{
-        // If we're not connected to the system DBus, don't even bother
-        // to continue...
-        if(!systemBus) reject(new Error('No system bus available'));
-        // Request our DBus service name
-        systemBus.requestName(DBUS_SERVICE,0, (err:any, res:number)=>{
-            if(err){
-                console.warn('\x1b[31mD-Bus service name aquisition failed: '+err+'\x1b[30m');
-                reject();
-            }
-            if( res !== 1){
-                console.warn('\x1b[31mUnexpected reply while requesting DBus service name: ' + res + '\x1b[30m');
-                reject(new Error('Unexpected reply: ' + res));
-            }
-            else
-                console.log('\x1b[32mD-Bus service name "'+DBUS_SERVICE+'" successfully aquired \x1b[30m');
-                resolve();
-        });
-    })
-}
-
-/*
- *  Create D-Bus interface
- */
-function createDbusInterface(){
-    systemBus.exportInterface( serviceObject, DBUS_PATH, {
-        name: DBUS_INTERFACE,
-         methods: {
-            setDigitalOutput: [ 'ib', 'b' ],
-            getDigitalOutput: [ 'i',  'b' ]
-        },
-        signals: {
-            updateActuator:['s']
-        }
+    systemBus.requestName(DBUS_SERVICE, 0, (err: Error | null, res: number) => {
+      if (err) {
+        reject(new Error(`D-Bus name acquisition failed: ${err.message ?? err}`));
+        return;
+      }
+      if (res !== 1) {
+        reject(new Error(`unexpected reply while requesting D-Bus name: ${res}`));
+        return;
+      }
+      resolve();
     });
-    console.log('D-Bus interface exported. Ready to accept calls.');
+  });
 }
+
+function releaseDbusName(): Promise<void> {
+  return new Promise((resolve) => {
+    if (!systemBus) { resolve(); return; }
+    systemBus.releaseName(DBUS_SERVICE, (err: Error | null) => {
+      if (err) console.warn(`Failed to release D-Bus name: ${err.message ?? err}`);
+      resolve();
+    });
+  });
+}
+
+function createDbusInterface(): void {
+  systemBus.exportInterface(serviceObject, DBUS_PATH, {
+    name: DBUS_INTERFACE,
+    methods: {
+      GetOutputs: ['s', 's'],
+      SetOutput: ['s', 's'],
+      SetOutputs: ['s', 's'],
+    },
+    signals: {
+      Ready: ['s'],
+      OutputChanged: ['s'],
+    },
+  });
+}
+
+/* ---------------------------------------------------------------------------
+ * Lifecycle.
+ * ------------------------------------------------------------------------- */
+async function main(): Promise<void> {
+  if (!systemBus) throw new Error('D-Bus client could not connect to the system bus');
+  // Startup order: mux pins -> drive all low -> acquire name -> export -> Ready.
+  await controller.initialize();
+  await registerDbusName();
+  createDbusInterface();
+  serviceObject.emit('Ready', JSON.stringify({ schemaVersion: SCHEMA_VERSION }));
+  console.log(`freya.cartridge.sensendrive ready (schemaVersion ${SCHEMA_VERSION})`);
+}
+
+let shuttingDown = false;
+
+/**
+ * Fully-awaited shutdown, guarded against double invocation: stop all timers ->
+ * drive all outputs low -> release the D-Bus name -> exit.
+ */
+async function shutdown(code: number): Promise<void> {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  try {
+    controller.stopAllTimers();
+    const failed = await controller.driveAllLow();
+    if (failed.length) {
+      console.error(`Failed to drive channels low on shutdown: ${failed.join(', ')}`);
+    }
+    await releaseDbusName();
+  } catch (err) {
+    console.error('Error during shutdown:', err);
+  } finally {
+    process.exit(code);
+  }
+}
+
+process.on('SIGTERM', () => { void shutdown(0); });
+process.on('SIGINT', () => { void shutdown(0); });
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err);
+  void shutdown(1);
+});
+
+main().catch((err) => {
+  console.error('Startup failed:', err);
+  void shutdown(1);
+});
