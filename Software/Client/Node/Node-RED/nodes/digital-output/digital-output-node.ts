@@ -76,7 +76,8 @@ const digitalOutput: NodeInitializer = (RED: NodeAPI) => {
 
     const channel = parseInt(config.channel, 10);
     if (!Number.isInteger(channel) || channel < 1 || channel > 6) {
-      node.status({ fill: 'red', shape: 'dot', text: 'no channel' });
+      // No channel assigned: the node is disabled (not an error).
+      node.status({ fill: 'grey', shape: 'ring', text: 'disabled' });
       return;
     }
     const client = getSharedClient();
@@ -99,8 +100,8 @@ const digitalOutput: NodeInitializer = (RED: NodeAPI) => {
     });
 
     const showState = (state: ChannelState): void => {
-      if (state.actual > 0) node.status({ fill: 'green', shape: 'dot', text: `on (${state.actual})` });
-      else node.status({ fill: 'grey', shape: 'ring', text: 'off' });
+      if (state.actual > 0) node.status({ fill: 'green', shape: 'dot', text: `ON | Value: ${state.actual}` });
+      else node.status({ fill: 'grey', shape: 'ring', text: 'OFF' });
     };
 
     const showError = (err: unknown): void => {

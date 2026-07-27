@@ -26,7 +26,7 @@
     color: "#70B62D",
     defaults: {
       name: {value:""},
-      channel: {value:"", required:true},
+      channel: {value:""},
       mode: {value:"switch"},
       frequency_hz: {value:""},
       rampRate: {value:""}
@@ -49,7 +49,7 @@
   <div class="form-row">
     <label for="node-input-channel"><i class="icon-cog"></i> Channel</label>
     <select id="node-input-channel">
-      <option value="" disabled selected>Select output...</option>
+      <option value="">No output assigned...</option>
       <option value="1">Digital Output 1</option>
       <option value="2">Digital Output 2</option>
       <option value="3">Digital Output 3</option>
@@ -64,20 +64,22 @@
     <select id="node-input-mode">
       <option value="off">off</option>
       <option value="switch">switch (on/off)</option>
-      <option value="pwm-slow" disabled>PWM slow — not yet implemented</option>
-      <option value="pwm" disabled>PWM — not yet implemented</option>
+      <option value="pwm-slow" disabled>Pulse (slow PWM)</option>
+      <option value="pwm" disabled>PWM</option>
+      <option value="pwm-fast" disabled>PWM fast</option>
     </select>
     <i class="fa fa-info-circle" title="The output mode. PWM tiers are placeholders for a future release."></i>
   </div>
   <div class="form-row">
     <label for="node-input-frequency_hz"><i class="fa fa-wave-square"></i> Frequency</label>
     <input type="text" id="node-input-frequency_hz" placeholder="Hz" disabled>
-    <span style="color:#999">not yet implemented</span>
+    <i class="fa fa-info-circle" title="not yet implemented"></i>
+
   </div>
   <div class="form-row">
     <label for="node-input-rampRate"><i class="fa fa-sliders"></i> Ramp rate</label>
     <input type="text" id="node-input-rampRate" placeholder="units / s" disabled>
-    <span style="color:#999">not yet implemented</span>
+    <i class="fa fa-info-circle" title="not yet implemented"></i>
   </div>
 </script>
 
@@ -86,7 +88,7 @@
   <h3>Input</h3>
   <dl class="message-properties">
     <dt>payload <span class="property-type">number</span></dt>
-    <dd>A value 0.0–1.0 sets the channel setpoint.</dd>
+    <dd>A value 0.0 - 1.0 sets the channel setpoint.</dd>
     <dt>payload <span class="property-type">boolean</span></dt>
     <dd>Maps to a setpoint of 0 or 1.</dd>
     <dt>payload <span class="property-type">object</span></dt>
