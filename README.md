@@ -65,16 +65,15 @@ an enveloped JSON response out.
 
 | Method | Request | Result |
 |---|---|---|
-| `GetOutputs` | `{}` | `{ "outputs": [ …6… ] }` |
+| `GetOutputs` | `{}` | `{ "outputs": [ ...6...] }` |
 | `SetOutput` | one write document | the resulting state |
-| `SetOutputs` | `{ "outputs": [ … ] }` | array of states |
+| `SetOutputs` | `{ "outputs": [ ... ] }` | array of states |
 
 
 ```json
-{ "ok": true,  "result": { … } }
-{ "ok": false, "error": { "code": "EINVAL", "message": "…" } }
+{ "ok": false, "error": { "code": "EINVAL", "message": "..." } }
 ```
-
+Or
 ```json
 { "ok": true, "result": {
     "channel": 2,
@@ -87,7 +86,7 @@ Signals: `Ready` at startup, and `OutputChanged` carrying one state document
 whenever a channel changes.
 
 ## License & Collaboration
-**Copyright© 2024-2026 Sanne 'SpuQ' Santens**. The hardware and enclosure are released under the [**CERN OHL-W**](Hardware/LICENSE.txt) license. The software is released under the [**GNU GPL-3.0**](Software/LICENSE.txt) license. Trademark rules apply to the [Freya™ brand](https://github.com/Freya-Vivariums/.github/blob/main/brand/Freya_Trademark_Rules_and_Guidelines.md) and the [Edgeberry™ brand](https://github.com/Edgeberry/.github/blob/main/brand/Edgeberry_Trademark_Rules_and_Guidelines.md).
+**Copyright© 2024-2026 Sanne 'SpuQ' Santens**. The hardware and enclosure are released under the [**CERN OHL-W**](Hardware/LICENSE.txt) license. The software is released under the [**GNU GPL-3.0**](Software/LICENSE.txt) license. Trademark rules apply to the [Freya™ brand](https://github.com/Freya-Vivariums/.github/blob/main/brand/Freya_Trademark_Rules_and_Guidelines.md).
 
 ### Collaboration
 
