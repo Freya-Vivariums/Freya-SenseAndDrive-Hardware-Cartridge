@@ -10,7 +10,7 @@ The **Sense'n'Drive Hardware Cartridge** provides the [controller](https://githu
 
 <br clear="right"/>
 
-## Usage
+## Hardware
 
 <img src="Documentation/SenseAndDrive_Cartridge_enclosure.png" align="left" width="40%"/>
 
@@ -40,20 +40,51 @@ Now you can use the I²C interface `/dev/i2c-1` for connecting peripheral compon
 
 ### Digital Outputs
 The digital outputs are P-channel MOSFETs configured for **sourcing**, and are connected as following:
-|  GPIO  | OUTPUT |
-|--------|--------|
-| GPIO21 | D1     |
-| GPIO20 | D2     |
-| GPIO16 | D3     |
-| GPIO13 | D4     |
-| GPIO12 | D5     |
-| GPIO18 | D6     |
+|  GPIO  | Hardware OUTPUT | Software CHANNEL |
+|--------|--------|---------|
+| GPIO21 | D1     | 1       |
+| GPIO20 | D2     | 2       |
+| GPIO16 | D3     | 3       |
+| GPIO13 | D4     | 4       |
+| GPIO12 | D5     | 5       |
+| GPIO18 | D6     | 6       |
 
 Controling the digital outputs can be done from the commandline using `pinctrl`.
 ```
 pinctrl set 21 op dh
 ```
-**'op' meaning 'output', 'dh' digital high, 'dl' digital low.*
+
+## Software
+The **Sense'n'Drive Hardware Cartridge driver** included in the repository is a systemd service (`freya.cartridge.sensendrive`) that is interacted with via a D-Bus API by the client libraries. The service provides methods for controlling the digital outputs in several operating modes.
+
+### D-Bus API
+System bus service and interface `freya.cartridge.sensendrive` · object
+`/freya/cartridge/sensendrive`. Methods are `(s) → s`: a bare JSON request in,
+an enveloped JSON response out.
+
+
+| Method | Request | Result |
+|---|---|---|
+| `GetOutputs` | `{}` | `{ "outputs": [ …6… ] }` |
+| `SetOutput` | one write document | the resulting state |
+| `SetOutputs` | `{ "outputs": [ … ] }` | array of states |
+
+
+```json
+{ "ok": true,  "result": { … } }
+{ "ok": false, "error": { "code": "EINVAL", "message": "…" } }
+```
+
+```json
+{ "ok": true, "result": {
+    "channel": 2,
+    "config": { "mode": "pulse", "frequency_hz": 0.1, "rampRate": 0 },
+    "setpoint": 0.3,
+    "actual": 0.3 } }
+```
+
+Signals: `Ready` at startup, and `OutputChanged` carrying one state document
+whenever a channel changes.
 
 ## License & Collaboration
 **Copyright© 2024-2026 Sanne 'SpuQ' Santens**. The hardware and enclosure are released under the [**CERN OHL-W**](Hardware/LICENSE.txt) license. The software is released under the [**GNU GPL-3.0**](Software/LICENSE.txt) license. Trademark rules apply to the [Freya™ brand](https://github.com/Freya-Vivariums/.github/blob/main/brand/Freya_Trademark_Rules_and_Guidelines.md) and the [Edgeberry™ brand](https://github.com/Edgeberry/.github/blob/main/brand/Edgeberry_Trademark_Rules_and_Guidelines.md).
