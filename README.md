@@ -58,8 +58,7 @@ pinctrl set 21 op dh
 The **Sense'n'Drive Hardware Cartridge driver** included in the repository is a systemd service (`freya.cartridge.sensendrive`) that is interacted with via a D-Bus API by the client libraries. The service provides methods for controlling the digital outputs in several operating modes.
 
 ### D-Bus API
-System bus service and interface `freya.cartridge.sensendrive` · object
-`/freya/cartridge/sensendrive`. Methods are `(s) → s`: a bare JSON request in,
+System bus service and interface `freya.cartridge.sensendrive`. Methods are `(s) → s`: a bare JSON request in,
 an enveloped JSON response out.
 
 
@@ -69,7 +68,16 @@ an enveloped JSON response out.
 | `SetOutput` | one write document | the resulting state |
 | `SetOutputs` | `{ "outputs": [ ... ] }` | array of states |
 
-
+#### Example
+Request:
+```json
+{
+  "channel": 2,
+  "config": { "mode": "pulse", "frequency_hz": 0.1, "rampRate": 0 },
+  "setpoint": 0.321
+}
+```
+Response:
 ```json
 { "ok": false, "error": { "code": "EINVAL", "message": "..." } }
 ```
@@ -78,7 +86,7 @@ Or
 { "ok": true, "result": {
     "channel": 2,
     "config": { "mode": "pulse", "frequency_hz": 0.1, "rampRate": 0 },
-    "setpoint": 0.3,
+    "setpoint": 0.321,
     "actual": 0.3 } }
 ```
 
