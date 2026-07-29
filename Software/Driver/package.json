@@ -1,6 +1,6 @@
 {
   "name": "freya-system-actuators-driver",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "System driver for the Freya system actuators",
   "author": "Sanne 'SpuQ' Santens",
   "license": "GPL-3.0-or-later",

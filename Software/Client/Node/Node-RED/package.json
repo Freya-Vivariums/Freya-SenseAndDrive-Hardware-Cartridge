@@ -1,6 +1,6 @@
 {
   "name": "@freya-vivariums/freya-hardware-cartridge-node-red-contrib",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "Node-RED node for the Freya Hardware Cartridge",
   "author": "Sanne 'SpuQ' Santens",
   "license": "MIT",
