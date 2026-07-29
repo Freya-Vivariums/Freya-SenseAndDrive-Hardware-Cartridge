@@ -69,7 +69,7 @@ an enveloped JSON response out.
 | `SetOutputs` | `{ "outputs": [ ... ] }` | array of states |
 
 #### Example
-Request:
+`SetOutput` request argument string:
 ```json
 {
   "channel": 2,
@@ -77,7 +77,7 @@ Request:
   "setpoint": 0.321
 }
 ```
-Response:
+Response string:
 ```json
 { "ok": false, "error": { "code": "EINVAL", "message": "..." } }
 ```
