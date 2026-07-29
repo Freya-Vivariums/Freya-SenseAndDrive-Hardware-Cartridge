@@ -33,14 +33,30 @@ physical output channel (1–6) and the mode.
 whenever the channel's realized state changes.
 
 **Modes:**
-- `off` — output driven low. *(available)*
-- `switch` — on/off; output high when the setpoint is ≥ 0.5. *(available)*
-- `pwm-slow` — slow pulse-width modulation (0.001–1 Hz). *(not yet implemented)*
-- `pwm` — pulse-width modulation (1–30 Hz). *(not yet implemented)*
+- **Off** (`off`) — output driven low.
+- **On/Off** (`switch`) — output high when the realized value is ≥ 0.5.
+- **Pulse** (`pwm-slow`) — slow pulse-width modulation, **0.001–1 Hz**. Duty
+  cycle equals the setpoint (e.g. 0.1 Hz at 0.3 → 3 s on / 7 s off every 10 s).
+- **PWM** (`pwm`) — pulse-width modulation, **1–60 Hz**. The 60 Hz ceiling is
+  bounded by the `pinctrl` process-spawn rate (one process per edge, ~1.6 ms
+  median / ~7 ms worst on a Raspberry Pi 5); duty accuracy softens toward the
+  top of the range. ("PWM fast" is reserved for a future tier.)
 
-The two PWM modes, along with the **Frequency** and **Ramp rate** fields, appear
-in the edit dialog but are disabled and marked *not yet implemented*; they are
-placeholders for a future release.
+  The frequency cap is not the only limit: because each edge costs a process
+  spawn, the shortest resolvable on-time is **~5 ms**, and at low duty that
+  minimum binds before the frequency does. 60 Hz is fine at 50 % duty (~8 ms
+  on-time) but not at 5 % (~0.8 ms). This is not enforced — extreme
+  duty/frequency pairs simply degrade gracefully rather than being rejected.
+
+**Frequency** is required for the two PWM modes and rejected out of range; it is
+ignored (and hidden) for Off / On/Off. **Ramp rate** is a soft start/stop in
+setpoint units per second (`0` = instant); it slides the realized value toward
+the setpoint, delaying the On/Off threshold crossing or the PWM duty change.
+
+**Ramping applies in every mode except `off`.** Selecting **Off** is a hard,
+immediate stop — it snaps the output low regardless of ramp rate. To fade an
+output down instead, keep its mode and set the setpoint to `0`: **`setpoint: 0`
+fades, `mode: off` snaps.**
 
 ## License & Collaboration
 **Copyright© 2025 Sanne 'SpuQ' Santens**. This project is licensed under the **[MIT License](LICENSE.txt)**. The [Rules & Guidelines](https://github.com/Freya-Vivariums/.github/blob/main/brand/Freya_Trademark_Rules_and_Guidelines.md) apply to the usage of the Freya Vivariums™ brand.

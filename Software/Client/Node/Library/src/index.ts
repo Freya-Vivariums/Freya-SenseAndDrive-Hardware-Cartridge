@@ -52,17 +52,16 @@ const RECONNECT_INTERVAL_MS = 5000;
  *
  * These are the single source of truth for the wire contract of the
  * freya.cartridge.sensendrive service. The driver imports them rather than
- * redeclaring, so all three packages stay in lockstep. All four modes are
- * declared here already; Steps 2-3 (PWM) require no type changes.
+ * redeclaring, so all three packages stay in lockstep.
  * ------------------------------------------------------------------------- */
 
-export type ChannelMode = 'off' | 'switch' | 'pwm-slow' | 'pwm';
+export type ChannelMode = 'off' | 'switch' | 'pulse';
 
 export interface ChannelConfig {
   mode: ChannelMode;
-  /** One knob for both PWM tiers: pwm-slow 0.001-1 Hz, pwm 1-30 Hz. `null` in off/switch. */
+  /** Pulse frequency (0.001-60 Hz); required for `pulse` mode, `null` in `off`/`switch`. */
   frequency_hz: number | null;
-  /** Setpoint units per second (>= 0). Stored in Step 1; acted upon later. */
+  /** Ramp speed in setpoint units per second (>= 0). 0 = no ramp (actual jumps to setpoint). */
   rampRate: number;
 }
 
@@ -87,7 +86,7 @@ export interface OutputWrite {
   setpoint?: number | null;
 }
 
-export type SenseNDriveErrorCode = 'ECHANNEL' | 'EMODE' | 'EINVAL' | 'EIO' | 'EJSON';
+export type SenseNDriveErrorCode = 'ECHANNEL' | 'EMODE' | 'EINVAL' | 'EIO' | 'EINTERNAL' | 'EJSON';
 
 /** Typed error carrying the driver's error `code` string. */
 export class SenseNDriveError extends Error {
@@ -96,6 +95,24 @@ export class SenseNDriveError extends Error {
     super(message);
     this.name = 'SenseNDriveError';
     this.code = code;
+  }
+}
+
+/**
+ * Transport-level failure: the driver could not be reached at all (its bus name
+ * is not owned, or the D-Bus call itself failed), so NO error envelope was ever
+ * produced. This is deliberately distinct from a `SenseNDriveError` with code
+ * `EIO`, which is a genuine pin-write fault reported by a driver that answered
+ * normally. Callers that want to quietly ignore "not connected yet" must catch
+ * THIS class specifically, so they do not also swallow real GPIO faults.
+ *
+ * It extends `SenseNDriveError` (carrying the synthetic code `ECONN`) so any
+ * existing `instanceof SenseNDriveError` handling keeps working.
+ */
+export class SenseNDriveConnectionError extends SenseNDriveError {
+  constructor(message: string) {
+    super('ECONN', message);
+    this.name = 'SenseNDriveConnectionError';
   }
 }
 
@@ -122,8 +139,14 @@ export interface SenseNDriveClientOptions {
  *   'outputChanged'  (ChannelState)   a channel's realized state changed
  *   'disconnected'   ()               driver's bus name was lost
  *
- * The client performs NO mode gating: pwm-slow/pwm pass straight through and
- * the driver rejects them, so this class needs no edits in Steps 2-3.
+ * The client performs NO mode gating: all modes pass straight through to the
+ * driver, which realizes them.
+ *
+ * Note on ramping: when a channel has a non-zero `rampRate`, its `actual` lags
+ * the `setpoint` — the driver walks `actual` toward `setpoint` over time and
+ * emits an `outputChanged` roughly twice a second during the transition. A
+ * write therefore returns the CURRENT `actual` (mid-ramp), not the eventual
+ * target; watch `outputChanged` to follow the ramp to completion.
  * ------------------------------------------------------------------------- */
 export class SenseNDriveClient extends EventEmitter {
   private readonly bus: any;
@@ -212,7 +235,9 @@ export class SenseNDriveClient extends EventEmitter {
   private call<T>(method: string, request: unknown): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       if (!this.iface) {
-        reject(new SenseNDriveError('EIO', 'not connected to the actuators driver'));
+        // Driver unreachable: no envelope was produced. Distinct from an EIO
+        // pin-write fault so callers can ignore "not connected yet" safely.
+        reject(new SenseNDriveConnectionError('not connected to the actuators driver'));
         return;
       }
       let reqJson: string;
@@ -220,7 +245,9 @@ export class SenseNDriveClient extends EventEmitter {
       catch { reject(new SenseNDriveError('EINVAL', 'request is not serializable')); return; }
 
       this.iface[method](reqJson, (err: Error | null, resJson: string) => {
-        if (err) { reject(new SenseNDriveError('EIO', err?.message ?? 'D-Bus call failed')); return; }
+        // A D-Bus transport error means the call never reached a responding
+        // driver — a connection failure, not a hardware EIO.
+        if (err) { reject(new SenseNDriveConnectionError(err?.message ?? 'D-Bus call failed')); return; }
         let env: ResponseEnvelope<T>;
         try { env = JSON.parse(resJson); }
         catch { reject(new SenseNDriveError('EIO', 'malformed response envelope from driver')); return; }
@@ -240,7 +267,11 @@ export class SenseNDriveClient extends EventEmitter {
     return result.outputs;
   }
 
-  /** Apply a merge-patch write to a single channel. */
+  /**
+   * Apply a merge-patch write to a single channel. The returned `ChannelState`
+   * reflects the state right now: with a non-zero `rampRate`, `actual` lags the
+   * `setpoint` and continues toward it via `outputChanged` events.
+   */
   async setOutput(write: OutputWrite): Promise<ChannelState> {
     return this.call<ChannelState>('SetOutput', write);
   }

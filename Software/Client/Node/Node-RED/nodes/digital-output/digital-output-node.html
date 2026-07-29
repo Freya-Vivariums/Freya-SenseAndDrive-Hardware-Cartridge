@@ -37,6 +37,24 @@
     icon: "font-awesome/fa-microchip",
     label: function() {
       return this.name || (this.channel ? ("Digital Output " + this.channel) : "Digital Output");
+    },
+    oneditprepare: function() {
+      // Frequency only applies to pulse mode; show/hide the row accordingly.
+      var updateFrequency = function() {
+        var mode = $("#node-input-mode").val();
+        var row = $("#node-row-frequency");
+        var input = $("#node-input-frequency_hz");
+        var hint = $("#node-hint-frequency");
+        if (mode === "pulse") {
+          row.show();
+          input.attr("placeholder", "0.001 - 60 Hz");
+          hint.text("Cycle rate (0.001 - 60 Hz). e.g. 0.1 Hz = a 10 s cycle. Duty accuracy softens toward the 60 Hz ceiling.");
+        } else {
+          row.hide();
+        }
+      };
+      $("#node-input-mode").on("change", updateFrequency);
+      updateFrequency();
     }
   });
 </script>
@@ -62,24 +80,22 @@
   <div class="form-row">
     <label for="node-input-mode"><i class="icon-exchange"></i> Mode</label>
     <select id="node-input-mode">
-      <option value="off">off</option>
-      <option value="switch">switch (on/off)</option>
-      <option value="pwm-slow" disabled>Pulse (slow PWM)</option>
-      <option value="pwm" disabled>PWM</option>
-      <option value="pwm-fast" disabled>PWM fast</option>
+      <option value="off">Off</option>
+      <option value="switch">On/Off</option>
+      <option value="pulse">Pulse</option>
+      <option value="" disabled>PWM (not yet available)</option>
     </select>
-    <i class="fa fa-info-circle" title="The output mode. PWM tiers are placeholders for a future release."></i>
+    <i class="fa fa-info-circle" title="The output mode. Off = pin low; On/Off = pin high at setpoint >= 0.5; Pulse = software PWM (0.001-60 Hz)."></i>
   </div>
-  <div class="form-row">
+  <div class="form-row" id="node-row-frequency">
     <label for="node-input-frequency_hz"><i class="fa fa-wave-square"></i> Frequency</label>
-    <input type="text" id="node-input-frequency_hz" placeholder="Hz" disabled>
-    <i class="fa fa-info-circle" title="not yet implemented"></i>
-
+    <input type="text" id="node-input-frequency_hz" placeholder="Hz">
+    <div><small id="node-hint-frequency" style="color:#888;"></small></div>
   </div>
   <div class="form-row">
     <label for="node-input-rampRate"><i class="fa fa-sliders"></i> Ramp rate</label>
-    <input type="text" id="node-input-rampRate" placeholder="units / s" disabled>
-    <i class="fa fa-info-circle" title="not yet implemented"></i>
+    <input type="text" id="node-input-rampRate" placeholder="units / s">
+    <i class="fa fa-info-circle" title="Soft start/stop speed in setpoint units per second. 0 = instant (no ramp)."></i>
   </div>
 </script>
 
@@ -95,7 +111,17 @@
     <dd>A partial write <code>{ config, setpoint }</code> for full control.</dd>
   </dl>
   <h3>Output</h3>
-  <p>Emits <code>msg.payload</code> as the channel state document whenever the channel's realized state changes.</p>
+  <p>Emits <code>msg.payload</code> as the channel state document whenever the channel's realized state changes. During a ramp this fires about twice a second as <code>actual</code> moves toward the setpoint.</p>
   <h3>Modes</h3>
-  <p><code>off</code> and <code>switch</code> are available now. <code>pwm-slow</code> and <code>pwm</code> are shown for reference but are not yet implemented.</p>
+  <dl class="message-properties">
+    <dt>Off</dt>
+    <dd>Output driven low.</dd>
+    <dt>On/Off</dt>
+    <dd>Digital switch: the pin is high when the realized value is &ge; 0.5, low otherwise.</dd>
+    <dt>Pulse <span class="property-type">0.001 - 60 Hz</span></dt>
+    <dd>Software pulse-width modulation. The duty cycle equals the setpoint, e.g. 0.1 Hz at setpoint 0.3 is 3 s on / 7 s off every 10 s. The 60 Hz ceiling is bounded by the <code>pinctrl</code> spawn rate (one process per edge, measured on a Raspberry Pi 5); duty accuracy softens toward the top of the range.</dd>
+  </dl>
+  <p>Set <strong>Frequency</strong> for Pulse mode; an out-of-range value is rejected. Frequency is ignored in Off / On/Off.</p>
+  <h3>Ramp rate</h3>
+  <p>Soft start/stop in setpoint units per second. <code>0</code> (default) applies changes instantly. A non-zero value moves the realized value toward the setpoint gradually — delaying the On/Off threshold crossing, or sliding the PWM duty. Changing the setpoint mid-ramp simply retargets from wherever the value currently is.</p>
 </script>

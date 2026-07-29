@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "System driver for the Freya system actuators",
   "author": "Sanne 'SpuQ' Santens",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/Freya-Vivariums",
   "public": false,
   "main": "build/index.js",

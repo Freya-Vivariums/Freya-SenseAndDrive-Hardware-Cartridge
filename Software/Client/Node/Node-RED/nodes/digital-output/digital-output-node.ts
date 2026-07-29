@@ -36,6 +36,7 @@ import { NodeAPI, NodeInitializer, Node, NodeMessageInFlow, NodeDef } from 'node
 import {
   SenseNDriveClient,
   SenseNDriveError,
+  SenseNDriveConnectionError,
   OutputWrite,
   ChannelState,
   ChannelMode,
@@ -51,6 +52,11 @@ interface NodeConfig extends NodeDef {
 
 function clamp01(n: number): number {
   return n < 0 ? 0 : n > 1 ? 1 : n;
+}
+
+/** Render a 0.0-1.0 float as a whole-percent string (no float noise). */
+function formatPercent(n: number): string {
+  return `${Math.round(clamp01(n) * 100)}%`;
 }
 
 /*
@@ -82,8 +88,8 @@ const digitalOutput: NodeInitializer = (RED: NodeAPI) => {
     }
     const client = getSharedClient();
 
-    // Modes pwm-slow/pwm are disabled in the edit dialog for Step 1, so only
-    // off/switch reach here. The value passes straight to the driver either way.
+    // All three modes (off, switch, pulse) are selectable; the value passes
+    // straight to the driver, which realizes it.
     const configuredMode = (config.mode || 'switch') as ChannelMode;
     const rampRate = parseFloat(config.rampRate);
     const frequency = parseFloat(config.frequency_hz);
@@ -99,9 +105,20 @@ const digitalOutput: NodeInitializer = (RED: NodeAPI) => {
       setpoint: lastSetpoint,
     });
 
+    // Status mirrors the driver's own rules: in `switch` the pin is ON only at
+    // actual >= 0.5 (matching the driver, not the old actual > 0 test); the PWM
+    // tiers are proportional, so show the duty as a percentage.
     const showState = (state: ChannelState): void => {
-      if (state.actual > 0) node.status({ fill: 'green', shape: 'dot', text: `ON | Value: ${state.actual}` });
-      else node.status({ fill: 'grey', shape: 'ring', text: 'OFF' });
+      const mode = state.config.mode;
+      if (mode === 'switch') {
+        if (state.actual >= 0.5) node.status({ fill: 'green', shape: 'dot', text: 'ON' });
+        else node.status({ fill: 'grey', shape: 'ring', text: 'OFF' });
+      } else if (mode === 'pulse') {
+        if (state.actual > 0) node.status({ fill: 'green', shape: 'dot', text: `Pulse ${formatPercent(state.actual)}` });
+        else node.status({ fill: 'grey', shape: 'ring', text: 'Pulse 0%' });
+      } else {
+        node.status({ fill: 'grey', shape: 'ring', text: 'OFF' });
+      }
     };
 
     const showError = (err: unknown): void => {
@@ -119,8 +136,9 @@ const digitalOutput: NodeInitializer = (RED: NodeAPI) => {
           if (s) showState(s);
         })
         .catch((err) => {
-          // EIO simply means not connected yet; 'ready' will reconcile later.
-          if (!(err instanceof SenseNDriveError && err.code === 'EIO')) showError(err);
+          // A connection error just means the driver isn't reachable yet; 'ready'
+          // will reconcile later. A real EIO (pin-write fault) is NOT swallowed.
+          if (!(err instanceof SenseNDriveConnectionError)) showError(err);
         });
     };
     const onReady = (): void => reconcile();
