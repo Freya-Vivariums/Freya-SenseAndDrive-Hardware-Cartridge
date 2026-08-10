@@ -33,6 +33,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+  # Published from build/, where the compiled JS lives and the 'file:' dependency
+  # on the SDK library has been resolved to a real version range.
   publish-node-red:
     name: Publish Node-RED node
     needs: publish-library

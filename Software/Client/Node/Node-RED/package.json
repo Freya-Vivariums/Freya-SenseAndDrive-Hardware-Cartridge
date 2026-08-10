@@ -1,6 +1,6 @@
 {
   "name": "@freya-vivariums/freya-hardware-cartridge-node-red-contrib",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node-RED node for the Freya Hardware Cartridge",
   "author": "Sanne 'SpuQ' Santens",
   "license": "MIT",
@@ -20,20 +20,21 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "bash ./scripts/build.sh"
+    "build": "bash ./scripts/build.sh",
+    "prepublishOnly": "node -e \"console.error('Run npm run build and publish from the build/ directory'); process.exit(1)\""
   },
   "node-red": {
     "version": ">=4.0.9",
     "nodes": {
-      "digital-output": "nodes/digital-output/digital-output-node.js"
+      "digital-output": "build/nodes/digital-output/digital-output-node.js"
     }
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "files": [
-    "icons",
-    "nodes"
+    "build/icons",
+    "build/nodes"
   ],
   "devDependencies": {
     "@types/node": "^20.0.0",

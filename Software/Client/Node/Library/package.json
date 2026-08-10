@@ -21,7 +21,8 @@
   "types": "build/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "bash ./scripts/build.sh"
+    "build": "bash ./scripts/build.sh",
+    "prepublishOnly": "npm run build"
   },
   "engines": {
     "node": ">=18.0.0"
