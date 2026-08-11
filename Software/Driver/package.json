@@ -1,6 +1,6 @@
 {
   "name": "freya-system-actuators-driver",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "System driver for the Freya system actuators",
   "author": "Sanne 'SpuQ' Santens",
   "license": "GPL-3.0-or-later",
@@ -18,7 +18,7 @@
     "dbus-native": "^0.4.0"
   },
   "devDependencies": {
-    "@freya-vivariums/freya-hardware-cartridge": "file:../Client/Node/Library",
+    "@freya-vivariums/freya-hardware-cartridge": "^0.4.0",
     "@types/node": "^25.9.1",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2"
