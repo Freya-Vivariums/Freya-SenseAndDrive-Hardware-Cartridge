@@ -18,7 +18,7 @@ import type {
   ChannelState,
   OutputWrite,
   SenseNDriveErrorCode,
-} from '@freya-vivariums/freya-hardware-cartridge';
+} from './dbus-contract';
 
 const execFileAsync = promisify(execFile);
 
