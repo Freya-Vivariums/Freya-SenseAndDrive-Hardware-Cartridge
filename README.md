@@ -30,7 +30,7 @@ The I²C sensor port is **level-shifted to 5V**, and connected to the JST 4P con
 | 4      | GND      |
 
 > [!NOTE]
-> On Raspberry Pi, before you can use the I²C port `/dev/i2c-1`, it must be enabled by using `raspi-config`:
+> Before you can use the I²C port `/dev/i2c-1` on Raspberry Pi, it must be enabled by using `raspi-config`:
 > ```
 > $ sudo raspi-config
 > 3     Interface options
