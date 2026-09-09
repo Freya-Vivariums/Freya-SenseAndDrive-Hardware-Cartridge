@@ -21,7 +21,7 @@ The digital outputs are P-channel MOSFETs configured for sourcing. An external p
 <br clear="left"/>
 
 ### Sensor Port
-The I²C sensor port is **level-shifted to 5V**, and wired to the `HY2.0-4P` connector (informally known as the "Grove connector") in the following way - making it directly compatible with a wide range of I²C breakout boards from a variaty of ecosystems.
+The I²C sensor port is **level-shifted to 5V**, and wired to the `HY2.0-4P` connector (informally known as the _Grove connector_) in the following way - making it directly compatible with a wide range of I²C breakout boards from a variaty of ecosystems.
 
 |  Pin   | Function |
 |--------|----------|
