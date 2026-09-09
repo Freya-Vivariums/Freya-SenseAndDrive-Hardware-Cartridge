@@ -30,14 +30,13 @@ The I²C sensor port is level-shifted to 5V, and connected to the JST 4P connect
 | 4      | GND      |
 
 > [!NOTE]
-> On Raspberry Pi the I²C port must be enabled, for example by using `raspi-config`:
+> On Raspberry Pi, before you can use the I²C port `/dev/i2c-1`, it must be enabled by using `raspi-config`:
 > ```
 > $ sudo raspi-config
 > 3     Interface options
 > I5    I2C
 > Enable
 > ```
-> Now you can use the I²C interface `/dev/i2c-1` for connecting peripheral components.
 
 ### Digital Outputs
 The digital outputs are **sourcing MOSFET** channels rated for up to 1A each, suitable for driving standard industrial actuators such as relays, contactors and solenoids. Output voltage follows the externally applied supply. At 24V DC, the outputs conform to the conventional sourcing digital output arrangement described in IEC 61131-2, so any actuator designed for a standard PLC output can be connected directly. Built-in flyback diodes clamp inductive loads.
