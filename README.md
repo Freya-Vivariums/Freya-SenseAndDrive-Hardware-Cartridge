@@ -56,10 +56,8 @@ The digital outputs are **sourcing MOSFET** channels rated for up to 1A each, su
 > [!WARNING]
 > The hardware cartridge is designed with a **shared ground** for all voltages (non-isolated). Always ensure the power supply for the digital outputs and the power supply for the device share a common ground.
 
-Controling the digital outputs can be done from the commandline using `pinctrl`.
-```
-pinctrl set 21 op dh
-```
+> [!INFO]
+> Controling the digital outputs can be done directly from the commandline using `pinctrl`. For example ```pinctrl set 21 op dh```
 
 ## Software
 The **Sense'n'Drive Hardware Cartridge driver** included in the repository is a systemd service (`freya.cartridge.sensendrive`) that is interacted with via a D-Bus API by the client libraries. The service provides methods for controlling the digital outputs in several operating modes.
