@@ -42,7 +42,7 @@ Now you can use the I²C interface `/dev/i2c-1` for connecting peripheral compon
 The digital outputs are **sourcing MOSFET** channels rated for up to 1A each, suitable for driving standard industrial actuators such as relays, contactors and solenoids. Output voltage follows the externally applied supply. At 24V DC, the outputs conform to the conventional sourcing digital output arrangement described in IEC 61131-2, so any actuator normally driven from a PLC output can be connected directly. Built-in flyback diodes clamp inductive loads across the full supported supply range. The Raspberry Pi GPIO pins are connected to the digital outputs as following:
 
 |  GPIO  | Hardware OUTPUT | Software CHANNEL |
-|--------|--------|---------|-------------|
+|--------|-----------------|------------------|
 | GPIO21 | D1     | 1       |
 | GPIO20 | D2     | 2       |
 | GPIO16 | D3     | 3       |
