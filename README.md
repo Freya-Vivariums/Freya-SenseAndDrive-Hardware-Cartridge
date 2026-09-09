@@ -39,7 +39,15 @@ $ sudo raspi-config
 Now you can use the I²C interface `/dev/i2c-1` for connecting peripheral components.
 
 ### Digital Outputs
-The digital outputs are **sourcing MOSFET** channels rated for up to 1A each, suitable for driving standard industrial actuators such as relays, contactors and solenoids. Output voltage follows the externally applied supply. At 24V DC, the outputs conform to the conventional sourcing digital output arrangement described in IEC 61131-2, so any actuator designed for a standard PLC output can be connected directly. Built-in flyback diodes clamp inductive loads. The Raspberry Pi GPIO pins are connected to the digital outputs as following:
+The digital outputs are **sourcing MOSFET** channels rated for up to 1A each, suitable for driving standard industrial actuators such as relays, contactors and solenoids. Output voltage follows the externally applied supply. At 24V DC, the outputs conform to the conventional sourcing digital output arrangement described in IEC 61131-2, so any actuator designed for a standard PLC output can be connected directly. Built-in flyback diodes clamp inductive loads.
+
+> [!IMPORTANT]
+> The digital outputs **do not feature internal short-circuit or overcurrent protection**. It is recommended to install a 1A or 1.25A fast-acting fuse on the power supply line.
+
+> [!WARNING]
+> The hardware cartridge is designed with a **shared ground** for all voltages (non-isolated). Always ensure the power supply for the digital outputs and the power supply for the device share a common ground.
+
+The Raspberry Pi GPIO pins are connected to the digital outputs as following:
 
 |Channel |  GPIO  | Software Driver Channel |
 |--------|-----------------|------------------|
@@ -49,12 +57,6 @@ The digital outputs are **sourcing MOSFET** channels rated for up to 1A each, su
 | D4     | GPIO13 | 4       |
 | D5     | GPIO12 | 5       |
 | D6     | GPIO18 | 6       | 
-
-> [!IMPORTANT]
-> The digital outputs **do not feature internal short-circuit or overcurrent protection**. It is recommended to install a 1A or 1.25A fast-acting fuse on the power supply line.
-
-> [!WARNING]
-> The hardware cartridge is designed with a **shared ground** for all voltages (non-isolated). Always ensure the power supply for the digital outputs and the power supply for the device share a common ground.
 
 > [!NOTE]
 > Controling the digital outputs can be done directly from the commandline using `pinctrl`. For example `pinctrl set 21 op dh`.
