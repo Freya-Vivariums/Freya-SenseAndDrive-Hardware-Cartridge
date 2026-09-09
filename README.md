@@ -39,18 +39,15 @@ $ sudo raspi-config
 Now you can use the I²C interface `/dev/i2c-1` for connecting peripheral components.
 
 ### Digital Outputs
-The digital outputs are P-channel MOSFETs configured for **sourcing**.
-
-
-The Raspberry Pi GPIO pins are connected to the digital outputs as following:
+The digital outputs are **sourcing MOSFET** channels rated for up to 1A each, suitable for driving standard industrial actuators such as relays, contactors and solenoids. Output voltage follows the externally applied supply. At 24V DC, the outputs conform to the conventional sourcing digital output arrangement described in IEC 61131-2, so any actuator normally driven from a PLC output can be connected directly. Built-in flyback diodes clamp inductive loads across the full supported supply range. The Raspberry Pi GPIO pins are connected to the digital outputs as following:
 |  GPIO  | Hardware OUTPUT | Software CHANNEL |
-|--------|--------|---------|
+|--------|--------|---------|-------------|
 | GPIO21 | D1     | 1       |
 | GPIO20 | D2     | 2       |
 | GPIO16 | D3     | 3       |
 | GPIO13 | D4     | 4       |
 | GPIO12 | D5     | 5       |
-| GPIO18 | D6     | 6       |
+| GPIO18 | D6     | 6       | 
 
 > [!IMPORTANT]
 > The digital outputs **do not feature internal short-circuit or overcurrent protection**. It is recommended to install a 1A or 1.25A fast-acting fuse on the 24V supply line.
