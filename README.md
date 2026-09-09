@@ -36,7 +36,7 @@ The I²C sensor port is level-shifted to 5V, and connected to the JST 4P connect
 > 3     Interface options
 > I5    I2C
 > Enable 
-```
+> ```
 
 ### Digital Outputs
 The digital outputs are **sourcing MOSFET** channels rated for up to 1A each, suitable for driving standard industrial actuators such as relays, contactors and solenoids. Output voltage follows the externally applied supply. At 24V DC, the outputs conform to the conventional sourcing digital output arrangement described in IEC 61131-2, so any actuator designed for a standard PLC output can be connected directly. Built-in flyback diodes clamp inductive loads.
