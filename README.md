@@ -14,14 +14,14 @@ The **Sense'n'Drive Hardware Cartridge** equips the [controller](https://github.
 
 <img src="Documentation/SenseAndDrive_Cartridge_enclosure.png" align="left" width="40%"/>
 
-The Sense'n'Drive Hardware Cartridge is positioned in the expansion slot on the back side of the controller. The Raspberry Pi's I²C bus is levelshifted to 5V enabling compatibility with a wide range of peripheral components. The bus is routed to a 4P-2.0mm D90 connector for connecting with the [Freya "Terra" Sensor](https://github.com/Freya-Vivariums/Freya-Terra-Sensor) or a wide range of breakout boards from different ecosystems.
+The Sense'n'Drive Hardware Cartridge is positioned in the expansion slot on the back side of the controller. The Raspberry Pi's I²C bus is levelshifted to 5V enabling compatibility with a wide range of peripheral components. The bus is routed to a `HY2.0-4P` (Grove) connector for connecting with the [Freya "Terra" Sensor](https://github.com/Freya-Vivariums/Freya-Terra-Sensor) or a wide range of breakout boards from different ecosystems.
 
 The digital outputs are P-channel MOSFETs configured for sourcing. An external power source can be applied to drive the digital outputs, or the controller's power source can be used by internally wiring the dedicated connectors.
 
 <br clear="left"/>
 
 ### Sensor Port
-The I²C sensor port is **level-shifted to 5V**, and connected to the JST 4P connector in the following way;
+The I²C sensor port is **level-shifted to 5V**, and connected to the `HY2.0-4P` (Grove) connector in the following way;
 |  Pin   | Function |
 |--------|----------|
 | 1      | SCL      |
