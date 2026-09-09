@@ -60,7 +60,7 @@ The Raspberry Pi GPIO pins are connected to the digital outputs as following:
 | D6     | GPIO18 | 6       | 
 
 > [!NOTE]
-> Controling the digital outputs can be done directly from the commandline using `pinctrl`. For example `pinctrl set 21 op dh`.
+> Controling the digital outputs can be done directly from the commandline using `pinctrl`. For example `pinctrl set 21 op dh` to use GPIO21 as a digital output and set high.
 
 ## Software
 The **Sense'n'Drive Hardware Cartridge driver** included in the repository is a systemd service (`freya.cartridge.sensendrive`) that is interacted with via a D-Bus API by the client libraries. The service provides methods for controlling the digital outputs in several operating modes.
