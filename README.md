@@ -51,7 +51,7 @@ The digital outputs are **sourcing MOSFET** channels rated for up to 1A each, su
 | GPIO18 | D6     | 6       | 
 
 > [!IMPORTANT]
-> The digital outputs **do not feature internal short-circuit or overcurrent protection**. It is recommended to install a 1A or 1.25A fast-acting fuse on the 24V supply line.
+> The digital outputs **do not feature internal short-circuit or overcurrent protection**. It is recommended to install a 1A or 1.25A fast-acting fuse on the power supply line.
 
 > [!WARNING]
 > The hardware cartridge is designed with a **shared ground** for all voltages (non-isolated). Always ensure the power supply for the digital outputs and the power supply for the device share a common ground.
