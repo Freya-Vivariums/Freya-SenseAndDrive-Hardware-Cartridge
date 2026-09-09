@@ -53,7 +53,10 @@ The Raspberry Pi GPIO pins are connected to the digital outputs as following:
 | GPIO18 | D6     | 6       |
 
 > [!IMPORTANT]
-> The digital outputs do not feature internal short-circuit or overcurrent protection. It is recommended to install a 1A or 1.25A fast-acting fuse on the 24V supply line.
+> The digital outputs **do not feature internal short-circuit or overcurrent protection**. It is recommended to install a 1A or 1.25A fast-acting fuse on the 24V supply line.
+
+> [!WARNING]
+> The hardware cartridge is designed with a **shared ground** for all voltages (non-isolated). Always ensure the power supply for the digital outputs and the power supply for the device share a common ground.
 
 Controling the digital outputs can be done from the commandline using `pinctrl`.
 ```
