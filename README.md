@@ -20,8 +20,8 @@ The digital outputs are P-channel MOSFETs configured for sourcing. An external p
 
 <br clear="left"/>
 
-### I²C sensor port
-The I²C port is level-shifted to 5V, and connected to the JST 4P connector in the following way;
+### Sensor Port
+The I²C sensor port is level-shifted to 5V, and connected to the JST 4P connector in the following way;
 |  Pin   | Function |
 |--------|----------|
 | 1      | SCL      |
