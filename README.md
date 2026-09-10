@@ -12,7 +12,7 @@ The **Sense'n'Drive Hardware Cartridge** equips the [controller](https://github.
 
 ## Usage
 
-<img src="Documentation/SenseAndDrive_Cartridge_enclosure.png" align="left" width="30%"/>
+<img src="Documentation/SenseAndDrive_Cartridge_enclosure.png" align="left" width="40%"/>
 
 The Sense'n'Drive Hardware Cartridge is slided in into the expansion slot on the back side of the controller. For using it in your application, install the driver from this repository and include the sdk library in your software.
 
