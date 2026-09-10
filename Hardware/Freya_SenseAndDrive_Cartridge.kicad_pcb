@@ -2612,7 +2612,7 @@
 		)
 		(model "/home/tom/Projects/Freya-Edgeberry/Freya-controller/Enclosure/EBZero_Enclosure_Freya_2.wrl"
 			(offset
-				(xyz 35.5 35.5 5.25)
+				(xyz 35.5 45.5 5.25)
 			)
 			(scale
 				(xyz 0.3937 0.3937 0.3937)
@@ -2623,7 +2623,7 @@
 		)
 		(model "/home/tom/Projects/Freya-Edgeberry/Freya-controller/Enclosure/EBZero.wrl"
 			(offset
-				(xyz 35.5 81.5 -1)
+				(xyz 35.5 92 -1)
 			)
 			(scale
 				(xyz 0.3937 0.3937 0.3937)
