@@ -2,7 +2,7 @@
 
 <img src="Documentation/SenseAndDrive_Cartridge.png" align="right" width="40%"/>
 
-The **Sense'n'Drive Hardware Cartridge** equips the [Edgeberry](https://github.com/Edgeberry) based controller with the capability for connecting sensors and driving actuators.
+The **Sense'n'Drive Hardware Cartridge** equips the [Edgeberry™](https://edgeberry.github.io) based controller with the capability for connecting sensors and driving actuators.
 
 **Features**
 - **6 digital outputs** for driving actuators directly or with interposing relays, with internal or external power source.
