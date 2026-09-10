@@ -16,6 +16,23 @@ The **Sense'n'Drive Hardware Cartridge** equips the [controller](https://github.
 
 The Sense'n'Drive Hardware Cartridge is slided in into the expansion slot on the back side of the controller. For using it in your application, install the driver from this repository and include the sdk library in your software.
 
+
+
+```js
+const { SenseNDriveClient } = require('@freya-vivariums/freya-hardware-cartridge');
+
+const cartridge = new SenseNDriveClient();
+
+// The client connects to the driver in the background,
+// so wait until the driver is available.
+cartridge.on('ready', async () => {
+  // Switch digital output D1 on ...
+  await cartridge.setOutput({ channel: 1, config: { mode: 'switch' }, setpoint: 1 });
+  // ... and off again, one second later.
+  setTimeout(() => cartridge.setOutput({ channel: 1, setpoint: 0 }), 1000);
+});
+```
+
 <br clear="left"/>
 
 ## Hardware
