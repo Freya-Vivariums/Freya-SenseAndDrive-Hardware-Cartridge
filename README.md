@@ -109,7 +109,7 @@ Signals: `Ready` at startup, and `OutputChanged` carrying one state document
 whenever a channel changes.
 
 ## License & Collaboration
-**Copyright© 2024-2026 Sanne 'SpuQ' Santens**. The hardware and enclosure are released under the [**CERN OHL-W**](Hardware/LICENSE.txt) license. The software is released under the [**GNU GPL-3.0**](Software/LICENSE.txt) license. Trademark rules apply to the [Freya™ brand](https://github.com/Freya-Vivariums/.github/blob/main/brand/Freya_Trademark_Rules_and_Guidelines.md).
+**Copyright© 2024-2026 Sanne 'SpuQ' Santens**. The hardware and enclosure are released under the [**CERN OHL-W**](Hardware/LICENSE.txt) license. The driver is released under the [**GNU GPL-3.0**](Software/Driver/LICENSE.txt) license and the sdk libraries under the [**MIT license**](Software/Client/LICENSE.txt) Trademark rules apply to the [Freya™ brand](https://github.com/Freya-Vivariums/.github/blob/main/brand/Freya_Trademark_Rules_and_Guidelines.md).
 
 ### Collaboration
 
