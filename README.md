@@ -57,14 +57,17 @@ The digital outputs are **sourcing MOSFET** channels rated for up to 1A each, su
 
 The Raspberry Pi GPIO pins are connected to the digital outputs as following:
 
-|Channel |  GPIO  | Software Driver Channel |
-|--------|-----------------|------------------|
-| D1     | GPIO21 | 1       |
-| D2     | GPIO20 | 2       |
-| D3     | GPIO16 | 3       |
-| D4     | GPIO13 | 4       |
-| D5     | GPIO12 | 5       |
-| D6     | GPIO18 | 6       | 
+|Channel |  GPIO  | Software Driver Channel | Comment |
+|--------|--------|-------------------------|---------|
+| D1     | GPIO21 | 1       |                     |
+| D2     | GPIO20 | 2       |                     |
+| D3     | GPIO16 | 3       |                     |
+| D4     | GPIO13 | 4       |                     |
+| D5     | GPIO12 | 5       |Hardware PWM capable* |
+| D6     | GPIO18 | 6       |Hardware PWM capable* |
+
+> [!NOTE]
+> TODO a note on Hardware PWM on Raspberry Pi
 
 > [!NOTE]
 > Controling the digital outputs can be done directly from the commandline using `pinctrl`. For example `pinctrl set 21 op dh` to use GPIO21 as a digital output and set high.
