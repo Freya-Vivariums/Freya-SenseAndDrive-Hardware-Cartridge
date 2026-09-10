@@ -23,12 +23,8 @@ const { SenseNDriveClient } = require('@freya-vivariums/freya-hardware-cartridge
 
 const cartridge = new SenseNDriveClient();
 
-// The client connects to the driver in the background,
-// so wait until the driver is available.
 cartridge.on('ready', async () => {
-  // Switch digital output D1 on ...
   await cartridge.setOutput({ channel: 1, config: { mode: 'switch' }, setpoint: 1 });
-  // ... and off again, one second later.
   setTimeout(() => cartridge.setOutput({ channel: 1, setpoint: 0 }), 1000);
 });
 ```
